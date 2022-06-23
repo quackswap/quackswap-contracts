@@ -71,7 +71,7 @@ describe("TreasuryVester.sol", function () {
       TOTAL_SUPPLY, // max supply
       0, // initial mint
       "PNG",
-      "Pangolin"
+      "QuackSwap"
     );
     await this.png.deployed();
 
@@ -564,7 +564,7 @@ describe("TreasuryVester.sol", function () {
         this.totalSupply, // max supply
         0, // initial mint
         "PNG",
-        "Pangolin"
+        "QuackSwap"
       );
       await this.png.deployed();
       // Deploy mock mini chef

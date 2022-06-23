@@ -1,19 +1,19 @@
 pragma solidity 0.8.11;
 
-import "../pangolin-core/interfaces/IERC20.sol";
-import "../pangolin-core/interfaces/IPangolinPair.sol";
-import "../pangolin-periphery/interfaces/IPangolinRouter.sol";
-import "../pangolin-periphery/interfaces/IWAVAX.sol";
+import "../quackswap-core/interfaces/IERC20.sol";
+import "../quackswap-core/interfaces/IQuackSwapPair.sol";
+import "../quackswap-periphery/interfaces/IQuackSwapRouter.sol";
+import "../quackswap-periphery/interfaces/IWBTT.sol";
 
-import "../pangolin-lib/libraries/Babylonian.sol";
-import "../pangolin-lib/libraries/TransferHelper.sol";
+import "../quackswap-lib/libraries/Babylonian.sol";
+import "../quackswap-lib/libraries/TransferHelper.sol";
 
 
 // SPDX-License-Identifier: MIT
 
 /// @author Wivern for Beefy.Finance
-/// @author bmino for Pangolin
-/// @notice This contract adds liquidity to Pangolin compatible liquidity pair pools and farms.
+/// @author bmino for QuackSwap
+/// @notice This contract adds liquidity to QuackSwap compatible liquidity pair pools and farms.
 
 
 interface IMiniChefV2 {
@@ -27,42 +27,42 @@ interface IMiniChefV2 {
 
 contract MiniChefV2Zapper {
 
-    IPangolinRouter public immutable router;
+    IQuackSwapRouter public immutable router;
     IMiniChefV2 public immutable miniChefV2;
-    address public immutable WAVAX;
+    address public immutable WBTT;
     uint256 public constant minimumAmount = 1000;
 
-    constructor(address _router, address _miniChefV2, address _WAVAX) {
-        // Safety checks to ensure WAVAX token address
-        IWAVAX(_WAVAX).deposit{value: 0}();
-        IWAVAX(_WAVAX).withdraw(0);
+    constructor(address _router, address _miniChefV2, address _WBTT) {
+        // Safety checks to ensure WBTT token address
+        IWBTT(_WBTT).deposit{value: 0}();
+        IWBTT(_WBTT).withdraw(0);
 
-        router = IPangolinRouter(_router);
+        router = IQuackSwapRouter(_router);
         miniChefV2 = IMiniChefV2(_miniChefV2);
-        WAVAX = _WAVAX;
+        WBTT = _WBTT;
     }
 
     receive() external payable {
-        assert(msg.sender == WAVAX);
+        assert(msg.sender == WBTT);
     }
 
-    function zapInAVAX(address pairAddress, uint256 tokenAmountOutMin) external payable {
+    function zapInBTT(address pairAddress, uint256 tokenAmountOutMin) external payable {
         require(msg.value >= minimumAmount, 'Insignificant input amount');
         require(pairAddress != address(0), 'Invalid pair address');
 
-        IWAVAX(WAVAX).deposit{value: msg.value}();
+        IWBTT(WBTT).deposit{value: msg.value}();
 
-        _swapAndFarm(pairAddress, WAVAX, tokenAmountOutMin, 0, false);
+        _swapAndFarm(pairAddress, WBTT, tokenAmountOutMin, 0, false);
     }
 
-    function zapInAndFarmAVAX(address pairAddress, uint256 tokenAmountOutMin, uint256 pid) external payable {
+    function zapInAndFarmBTT(address pairAddress, uint256 tokenAmountOutMin, uint256 pid) external payable {
         require(msg.value >= minimumAmount, 'Insignificant input amount');
         require(pairAddress != address(0), 'Invalid pair address');
         require(miniChefV2.lpToken(pid) == pairAddress, 'Pair address does not correspond with pid');
 
-        IWAVAX(WAVAX).deposit{value: msg.value}();
+        IWBTT(WBTT).deposit{value: msg.value}();
 
-        _swapAndFarm(pairAddress, WAVAX, tokenAmountOutMin, pid, true);
+        _swapAndFarm(pairAddress, WBTT, tokenAmountOutMin, pid, true);
     }
 
     function zapIn(address pairAddress, address tokenIn, uint256 tokenInAmount, uint256 tokenAmountOutMin) public {
@@ -82,7 +82,7 @@ contract MiniChefV2Zapper {
         uint256 deadline,
         uint8 v, bytes32 r, bytes32 s
     ) external {
-        IPangolinPair(tokenIn).permit(msg.sender, address(this), tokenInAmount, deadline, v, r, s);
+        IQuackSwapPair(tokenIn).permit(msg.sender, address(this), tokenInAmount, deadline, v, r, s);
         zapIn(pairAddress, tokenIn, tokenInAmount, tokenAmountOutMin);
     }
 
@@ -111,34 +111,34 @@ contract MiniChefV2Zapper {
         uint256 deadline,
         uint8 v, bytes32 r, bytes32 s
     ) external {
-        IPangolinPair(tokenIn).permit(msg.sender, address(this), tokenInAmount, deadline, v, r, s);
+        IQuackSwapPair(tokenIn).permit(msg.sender, address(this), tokenInAmount, deadline, v, r, s);
         zapInAndFarm(pairAddress, tokenIn, tokenInAmount, tokenAmountOutMin, pid);
     }
 
-    function zapOutAndSwapAVAX(
+    function zapOutAndSwapBTT(
         address pairAddress,
         uint256 withdrawAmount,
-        uint256 desiredAVAXOutMin,
+        uint256 desiredBTTOutMin,
         address to
     ) public {
-        zapOutAndSwap(pairAddress, withdrawAmount, WAVAX, desiredAVAXOutMin, address(this));
+        zapOutAndSwap(pairAddress, withdrawAmount, WBTT, desiredBTTOutMin, address(this));
 
-        uint256 balance = IERC20(WAVAX).balanceOf(address(this));
-        IWAVAX(WAVAX).withdraw(balance);
+        uint256 balance = IERC20(WBTT).balanceOf(address(this));
+        IWBTT(WBTT).withdraw(balance);
 
-        TransferHelper.safeTransferAVAX(to, balance);
+        TransferHelper.safeTransferBTT(to, balance);
     }
 
-    function zapOutAndSwapAVAXViaPermit(
+    function zapOutAndSwapBTTViaPermit(
         address pairAddress,
         uint256 withdrawAmount,
-        uint256 desiredAVAXOutMin,
+        uint256 desiredBTTOutMin,
         address to,
         uint256 deadline,
         uint8 v, bytes32 r, bytes32 s
     ) external {
-        IPangolinPair(pairAddress).permit(msg.sender, address(this), withdrawAmount, deadline, v, r, s);
-        zapOutAndSwapAVAX(pairAddress, withdrawAmount, desiredAVAXOutMin, to);
+        IQuackSwapPair(pairAddress).permit(msg.sender, address(this), withdrawAmount, deadline, v, r, s);
+        zapOutAndSwapBTT(pairAddress, withdrawAmount, desiredBTTOutMin, to);
     }
 
     function zapOut(address pairAddress, uint256 withdrawAmount, address to) public {
@@ -153,7 +153,7 @@ contract MiniChefV2Zapper {
         uint256 deadline,
         uint8 v, bytes32 r, bytes32 s
     ) external {
-        IPangolinPair(pairAddress).permit(msg.sender, address(this), withdrawAmount, deadline, v, r, s);
+        IQuackSwapPair(pairAddress).permit(msg.sender, address(this), withdrawAmount, deadline, v, r, s);
         zapOut(pairAddress, withdrawAmount, to);
     }
 
@@ -164,7 +164,7 @@ contract MiniChefV2Zapper {
         uint256 desiredTokenOutMin,
         address to
     ) public {
-        IPangolinPair pair = IPangolinPair(pairAddress);
+        IQuackSwapPair pair = IQuackSwapPair(pairAddress);
 
         address token0 = pair.token0();
         address token1 = pair.token1();
@@ -200,16 +200,16 @@ contract MiniChefV2Zapper {
         uint256 deadline,
         uint8 v, bytes32 r, bytes32 s
     ) external {
-        IPangolinPair(pairAddress).permit(msg.sender, address(this), withdrawAmount, deadline, v, r, s);
+        IQuackSwapPair(pairAddress).permit(msg.sender, address(this), withdrawAmount, deadline, v, r, s);
         zapOutAndSwap(pairAddress, withdrawAmount, desiredToken, desiredTokenOutMin, to);
     }
 
     function _removeLiquidity(address pair, address to) private {
         TransferHelper.safeTransfer(pair, pair, IERC20(pair).balanceOf(address(this)));
-        (uint256 amount0, uint256 amount1) = IPangolinPair(pair).burn(to);
+        (uint256 amount0, uint256 amount1) = IQuackSwapPair(pair).burn(to);
 
-        require(amount0 >= minimumAmount, 'PangolinRouter: INSUFFICIENT_A_AMOUNT');
-        require(amount1 >= minimumAmount, 'PangolinRouter: INSUFFICIENT_B_AMOUNT');
+        require(amount0 >= minimumAmount, 'QuackSwapRouter: INSUFFICIENT_A_AMOUNT');
+        require(amount1 >= minimumAmount, 'QuackSwapRouter: INSUFFICIENT_B_AMOUNT');
     }
 
     function _swapAndFarm(
@@ -219,7 +219,7 @@ contract MiniChefV2Zapper {
         uint256 pid,
         bool farmFlag
     ) private {
-        IPangolinPair pair = IPangolinPair(pairAddress);
+        IQuackSwapPair pair = IQuackSwapPair(pairAddress);
 
         (uint256 reserve0, uint256 reserve1,) = pair.getReserves();
         require(reserve0 > minimumAmount && reserve1 > minimumAmount, 'Liquidity pair reserves too low');
@@ -298,7 +298,7 @@ contract MiniChefV2Zapper {
         address tokenIn,
         uint256 fullInvestmentIn
     ) external view returns(uint256 swapAmountIn, uint256 swapAmountOut, address swapTokenOut) {
-        IPangolinPair pair = IPangolinPair(pairAddress);
+        IQuackSwapPair pair = IQuackSwapPair(pairAddress);
 
         bool isInputA = pair.token0() == tokenIn;
         require(isInputA || pair.token1() == tokenIn, 'Input token not present in liquidity pair');

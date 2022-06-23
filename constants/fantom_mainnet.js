@@ -1,7 +1,7 @@
 const WFTM = "0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83";
 exports.WRAPPED_NATIVE_TOKEN = WFTM;
 exports.PNG_SYMBOL = "fanPNG";
-exports.PNG_NAME = "Pangolin";
+exports.PNG_NAME = "QuackSwap";
 exports.TOTAL_SUPPLY = 230000000; // 230M
 exports.AIRDROP_AMOUNT = 11500000; // 11.5M or 5% of max supply
 exports.TIMELOCK_DELAY = 3 * 24 * 60 * 60; // 3 days

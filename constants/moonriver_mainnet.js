@@ -1,7 +1,7 @@
 const WMOVR = "0x98878B06940aE243284CA214f92Bb71a2b032B8A";
 exports.WRAPPED_NATIVE_TOKEN = WMOVR;
 exports.PNG_SYMBOL = "PMR";
-exports.PNG_NAME = "Pangolin Moonriver";
+exports.PNG_NAME = "QuackSwap Moonriver";
 exports.TOTAL_SUPPLY = 230000000; // 230M
 exports.AIRDROP_AMOUNT = 11500000; // 11.5M or 5% of max supply
 exports.TIMELOCK_DELAY = 3 * 24 * 60 * 60; // 3 days

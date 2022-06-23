@@ -9,7 +9,7 @@ import "openzeppelin-contracts-legacy/math/SignedSafeMath.sol";
 import "openzeppelin-contracts-legacy/utils/SafeCast.sol";
 
 import "./IRewarder.sol";
-import "../pangolin-token/IPangolinERC20.sol";
+import "../quackswap-token/IQuackSwapERC20.sol";
 
 interface IMigratorChef {
     // Take the current LP token address and return the new LP token address.
@@ -45,7 +45,7 @@ contract MiniChefV2 is Ownable {
     }
 
     /// @notice Address of reward (PNG) contract.
-    IPangolinERC20 public immutable REWARD;
+    IQuackSwapERC20 public immutable REWARD;
     // @notice The migrator contract. It has a lot of power. Can only be set through governance (owner).
     IMigratorChef public migrator;
     bool public migrationDisabled;
@@ -99,7 +99,7 @@ contract MiniChefV2 is Ownable {
             "MiniChefV2::Cannot construct with zero address"
         );
 
-        REWARD = IPangolinERC20(_rewardToken);
+        REWARD = IQuackSwapERC20(_rewardToken);
         transferOwnership(_firstOwner);
     }
 

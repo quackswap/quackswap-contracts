@@ -3,7 +3,7 @@ pragma experimental ABIEncoderV2;
 
 contract GovernorAlpha {
     /// @notice The name of this contract
-    string public constant name = "Pangolin Governor Alpha";
+    string public constant name = "QuackSwap Governor Alpha";
 
     /// @notice The number of votes required in order for a voter to become a proposer
     uint public proposalThreshold;
@@ -17,10 +17,10 @@ contract GovernorAlpha {
     /// @notice The duration of voting on a proposal, in blocks
     function votingPeriod() public pure returns (uint) { return 3 days; }
 
-    /// @notice The address of the Pangolin Protocol Timelock
+    /// @notice The address of the QuackSwap Protocol Timelock
     TimelockInterface public timelock;
 
-    /// @notice The address of the Pangolin governance token
+    /// @notice The address of the QuackSwap governance token
     PngInterface public png;
 
     /// @notice The address of the Governor Guardian

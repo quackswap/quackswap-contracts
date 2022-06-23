@@ -158,20 +158,20 @@ async function main() {
     ];
 
     const description =
-`# Pangolin V2 and The New Tokenomics
-TLDR: Implement Pangolin tokenomics change with improved farming system
+`# QuackSwap V2 and The New Tokenomics
+TLDR: Implement QuackSwap tokenomics change with improved farming system
 
 ## What is the goal?
-Pangolin is moving to a significantly improved tokenomics system allowing the protocol to best compete with other DEXes on Avalanche and strategically allocate rewards to liquidity providers! 
+QuackSwap is moving to a significantly improved tokenomics system allowing the protocol to best compete with other DEXes on Avalanche and strategically allocate rewards to liquidity providers! 
 
 ## What is changing?
 The system powering farming rewards will require one final migration and will receive boosted rewards for the first 30 days to compensate farmers for the transition. 
 
-This will shorten the total token emission period because emitting PNG over 28 years is too long of a timeframe for DeFi. The diluted market cap of Pangolin will change from 530m PNG to 230m PNG over the course of approximately 3 years from now. 
+This will shorten the total token emission period because emitting PNG over 28 years is too long of a timeframe for DeFi. The diluted market cap of QuackSwap will change from 530m PNG to 230m PNG over the course of approximately 3 years from now. 
 
-This will also grow the treasury from 13m PNG to 30m PNG over the course of 29 months, enabling Pangolin to further innovate and continue to add new features and improve the user experience.
+This will also grow the treasury from 13m PNG to 30m PNG over the course of 29 months, enabling QuackSwap to further innovate and continue to add new features and improve the user experience.
  
-The farming pools will be focused to 37 farms at launch and can still be amended by the community via the Pangolin multisig.
+The farming pools will be focused to 37 farms at launch and can still be amended by the community via the QuackSwap multisig.
 
 ## How does this impact users?
 Users will benefit from increased rewards and more competitive farms. 

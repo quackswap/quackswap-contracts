@@ -15,8 +15,8 @@ describe('FeeCollector', function() {
     const GOVERNOR_ROLE = keccak256('GOVERNOR_ROLE');
 
     let OWNER, addr1, addr2, addr3, governorSigner;
-    let FeeCollector, MiniChefV2, StakingRewards, PangolinFactory, PangolinPair, _Token;
-    let feeCollector, pangolinFactory, stakingRewards, _miniChefV2;
+    let FeeCollector, MiniChefV2, StakingRewards, QuackSwapFactory, QuackSwapPair, _Token;
+    let feeCollector, quackSwapFactory, stakingRewards, _miniChefV2;
     let wavax, png, tokenA, tokenB;
 
     before(async function() {
@@ -37,8 +37,8 @@ describe('FeeCollector', function() {
         FeeCollector = await ethers.getContractFactory('FeeCollector');
         MiniChefV2 = await ethers.getContractFactory('MiniChefV2');
         StakingRewards = await ethers.getContractFactory('StakingRewards');
-        PangolinFactory = await ethers.getContractFactory('PangolinFactory');
-        PangolinPair = await ethers.getContractFactory('PangolinPair');
+        QuackSwapFactory = await ethers.getContractFactory('QuackSwapFactory');
+        QuackSwapPair = await ethers.getContractFactory('QuackSwapPair');
 
         _Token = await smock.mock('Png');
     });
@@ -58,7 +58,7 @@ describe('FeeCollector', function() {
             ethers.utils.parseEther('100000000'), // _maxSupply
             ethers.utils.parseEther('100000000'), // initialSupply
             'PNG', // _symbol
-            'Pangolin Token', // _name
+            'QuackSwap Token', // _name
         );
         await png.deployed();
 
@@ -84,12 +84,12 @@ describe('FeeCollector', function() {
         );
         await stakingRewards.deployed();
 
-        pangolinFactory = await PangolinFactory.deploy(OWNER.address);
-        await pangolinFactory.deployed();
+        quackSwapFactory = await QuackSwapFactory.deploy(OWNER.address);
+        await quackSwapFactory.deployed();
 
         feeCollector = await FeeCollector.deploy(
             wavax.address,
-            pangolinFactory.address,
+            quackSwapFactory.address,
             '0x40231f6b438bce0797c9ada29b718a87ea0a5cea3fe9a771abdd76bd41a3e545', // init pair hash
             stakingRewards.address,
             _miniChefV2.address,
@@ -101,7 +101,7 @@ describe('FeeCollector', function() {
         await feeCollector.deployed();
 
         // Enable fee switch
-        await pangolinFactory.setFeeTo(feeCollector.address);
+        await quackSwapFactory.setFeeTo(feeCollector.address);
 
         // FeeCollector needs ownership of StakingRewards to fund the program
         await stakingRewards.transferOwnership(feeCollector.address);
@@ -500,7 +500,7 @@ describe('FeeCollector', function() {
             userWithoutRecoveryRole = addr2;
             await feeCollector.connect(OWNER).revokeRole(RECOVERY_ROLE, userWithoutRecoveryRole.address);
 
-            _lp0 = await smock.fake(PangolinPair);
+            _lp0 = await smock.fake(QuackSwapPair);
 
             _lp0.transfer.whenCalledWith(TREASURY_ADDRESS, bal).returns(true);
             _lp0.balanceOf.whenCalledWith(feeCollector.address).returns(bal);
@@ -525,9 +525,9 @@ describe('FeeCollector', function() {
 
     // Helpers
     async function createPair(tokenA, tokenB) {
-        await pangolinFactory.createPair(tokenA.address, tokenB.address);
-        const address = await pangolinFactory.getPair(tokenA.address, tokenB.address);
-        return PangolinPair.attach(address);
+        await quackSwapFactory.createPair(tokenA.address, tokenB.address);
+        const address = await quackSwapFactory.getPair(tokenA.address, tokenB.address);
+        return QuackSwapPair.attach(address);
     }
     async function addLiquidity(pair, tokenA, amountA, tokenB, amountB, user) {
         await tokenA.connect(user).transfer(pair.address, amountA);

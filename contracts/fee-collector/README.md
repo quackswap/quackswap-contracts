@@ -1,4 +1,4 @@
-# Pangolin Fee Collector
+# QuackSwap Fee Collector
 
 Contract to which fees taken from the pools and paid out in PGL are redirected. The contract swaps the fees to PNG and uses them to fund the staking rewards for PNG. If additional rewards are available from emissions they can likewise be harvested and redirected to the staking rewards contract.
 

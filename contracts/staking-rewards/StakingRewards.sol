@@ -6,7 +6,7 @@ import "openzeppelin-contracts-legacy/math/SafeMath.sol";
 import "openzeppelin-contracts-legacy/token/ERC20/SafeERC20.sol";
 import "openzeppelin-contracts-legacy/utils/ReentrancyGuard.sol";
 
-import "../pangolin-token/IPangolinERC20.sol";
+import "../quackswap-token/IQuackSwapERC20.sol";
 
 
 // https://docs.synthetix.io/contracts/source/contracts/stakingrewards
@@ -80,7 +80,7 @@ contract StakingRewards is ReentrancyGuard, Ownable {
         _balances[msg.sender] = _balances[msg.sender].add(amount);
 
         // permit
-        IPangolinERC20(address(stakingToken)).permit(msg.sender, address(this), amount, deadline, v, r, s);
+        IQuackSwapERC20(address(stakingToken)).permit(msg.sender, address(this), amount, deadline, v, r, s);
 
         stakingToken.safeTransferFrom(msg.sender, address(this), amount);
         emit Staked(msg.sender, amount);

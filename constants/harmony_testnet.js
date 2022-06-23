@@ -1,7 +1,7 @@
 const WONE = "0xcF664087a5bB0237a0BAd6742852ec6c8d69A27a";
 exports.WRAPPED_NATIVE_TOKEN = WONE;
 exports.PNG_SYMBOL = "harPNG";
-exports.PNG_NAME = "Pangolin";
+exports.PNG_NAME = "QuackSwap";
 exports.TOTAL_SUPPLY = 230000000; // 230M
 exports.AIRDROP_AMOUNT = 11500000; // 11.5M or 5% of max supply
 exports.TIMELOCK_DELAY = 3 * 24 * 60 * 60; // 3 days

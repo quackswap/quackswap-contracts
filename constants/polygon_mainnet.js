@@ -1,7 +1,7 @@
 const WMATIC = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270";
 exports.WRAPPED_NATIVE_TOKEN = WMATIC;
 exports.PNG_SYMBOL = "matPNG";
-exports.PNG_NAME = "Pangolin";
+exports.PNG_NAME = "QuackSwap";
 exports.TOTAL_SUPPLY = 230000000; // 230M
 exports.AIRDROP_AMOUNT = 11500000; // 11.5M or 5% of max supply
 exports.TIMELOCK_DELAY = 3 * 24 * 60 * 60; // 3 days

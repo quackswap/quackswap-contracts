@@ -124,8 +124,8 @@ async function main() {
         multisig.address,
         TIMELOCK_DELAY,
     ]);
-    const factory = await deploy("PangolinFactory", [deployer.address]);
-    const router = await deploy("PangolinRouter", [
+    const factory = await deploy("QuackSwapFactory", [deployer.address]);
+    const router = await deploy("QuackSwapRouter", [
         factory.address,
         nativeToken,
     ]);
@@ -243,7 +243,7 @@ async function main() {
 
     await factory.setFeeToSetter(multisig.address);
     await confirmTransactionCount();
-    console.log("Transferred PangolinFactory ownership to Multisig.");
+    console.log("Transferred QuackSwapFactory ownership to Multisig.");
 
     /********************
      * MINICHEFv2 FARMS *

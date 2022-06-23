@@ -1,7 +1,7 @@
 const WAGMI = "0x3Ee7094DADda15810F191DD6AcF7E4FFa37571e4";
 exports.WRAPPED_NATIVE_TOKEN = WAGMI;
 exports.PNG_SYMBOL = "wagmiPNG";
-exports.PNG_NAME = "Pangolin";
+exports.PNG_NAME = "QuackSwap";
 exports.TOTAL_SUPPLY = 230000000; // 230M
 exports.AIRDROP_AMOUNT = 11500000; // 11.5M or 5% of max supply
 exports.TIMELOCK_DELAY = 3 * 24 * 60 * 60; // 3 days

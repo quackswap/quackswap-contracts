@@ -12,8 +12,8 @@ describe('PoolCreation', function () {
 
     before(async function () {
         [ this.admin, this.unprivileged ] = await ethers.getSigners();
-        this.PangolinFactory = await ethers.getContractFactory("PangolinFactory");
-        this.PangolinRouter = await ethers.getContractFactory("PangolinRouter");
+        this.QuackSwapFactory = await ethers.getContractFactory("QuackSwapFactory");
+        this.QuackSwapRouter = await ethers.getContractFactory("QuackSwapRouter");
         this.PNG = await ethers.getContractFactory("Png");
         this.WAVAX = await ethers.getContractFactory("Png");
         this.NATERC20 = await ethers.getContractFactory("Png");
@@ -22,7 +22,7 @@ describe('PoolCreation', function () {
 
     beforeEach(async function () {
         // deploy some Tokens for test
-        this.png = await this.PNG.deploy(TOTAL_SUPPLY, AIRDROP_SUPPLY, "PNG", "Pangolin");
+        this.png = await this.PNG.deploy(TOTAL_SUPPLY, AIRDROP_SUPPLY, "PNG", "QuackSwap");
         await this.png.deployed();
         this.wavax = await this.WAVAX.deploy(TOTAL_SUPPLY, AIRDROP_SUPPLY, "WAVAX", "Wrapped Avax");
         await this.wavax.deployed();
@@ -31,10 +31,10 @@ describe('PoolCreation', function () {
         this.jbxerc20 = await this.JBXERC20.deploy(TOTAL_SUPPLY, AIRDROP_SUPPLY, "JBX", "JBXERC20");
         await this.jbxerc20.deployed();
         //Deploy Factory
-        this.factory = await this.PangolinFactory.deploy(this.admin.address);
+        this.factory = await this.QuackSwapFactory.deploy(this.admin.address);
         await this.factory.deployed();
         //Deploy Router
-        this.router = await this.PangolinRouter.deploy(this.factory.address, this.wavax.address);
+        this.router = await this.QuackSwapRouter.deploy(this.factory.address, this.wavax.address);
         await this.router.deployed();
         //Deadline parameter
         this.deadline = Math.floor(Date.now()/1000) + 1000000;
@@ -54,7 +54,7 @@ describe('PoolCreation', function () {
         });
         it("Create same pair 2 times", async function() {
             await expect(this.factory.createPair(this.png.address, this.wavax.address)).to.emit(this.factory, "PairCreated");
-            await expect(this.factory.createPair(this.png.address, this.wavax.address)).to.be.revertedWith("Pangolin: PAIR_EXISTS");
+            await expect(this.factory.createPair(this.png.address, this.wavax.address)).to.be.revertedWith("QuackSwap: PAIR_EXISTS");
         });
         it("Create some pairs", async function() {
             await expect(this.factory.createPair(this.png.address, this.wavax.address)).to.emit(this.factory, "PairCreated");
@@ -64,7 +64,7 @@ describe('PoolCreation', function () {
             await expect(this.factory.createPair(this.naterc20.address, this.png.address)).to.emit(this.factory, "PairCreated");
         });
         it("Create Pair with Zero address", async function() {
-            await expect(this.factory.createPair(this.naterc20.address, ZERO_ADDRESS)).to.be.revertedWith("Pangolin: ZERO_ADDRESS");
+            await expect(this.factory.createPair(this.naterc20.address, ZERO_ADDRESS)).to.be.revertedWith("QuackSwap: ZERO_ADDRESS");
         });
         it("Create Pair and AddLiquidity", async function() {
             await expect(this.factory.createPair(this.png.address, this.wavax.address)).to.emit(this.factory, "PairCreated");

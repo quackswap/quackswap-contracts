@@ -1,5 +1,5 @@
-# Pangolin Smart Contracts
-This repo contains all of the smart contracts used to run [Pangolin](pangolin.exchange).
+# QuackSwap Smart Contracts
+This repo contains all of the smart contracts used to run [QuackSwap](quackSwap.exchange).
 
 ## Deployed Contracts
 Factory address: `0xefa94DE7a4656D787667C749f7E1223D71E9FD88`
@@ -15,7 +15,7 @@ To prepare the dev environment, run `yarn install`. To compile the contracts, ru
 
 
 ## Accessing the ABI
-If you need to use any of the contract ABIs, you can install this repo as an npm package with `npm install --dev @pangolindex/exchange-contracts`. Then import the ABI like so: `import { abi as IPangolinPairABI } from '@pangolindex/exchange-contracts/artifacts/contracts/pangolin-core/interfaces/IPangolinPair.sol/IPangolinPair.json'`.
+If you need to use any of the contract ABIs, you can install this repo as an npm package with `npm install --dev @quackSwapdex/exchange-contracts`. Then import the ABI like so: `import { abi as IQuackSwapPairABI } from '@quackSwapdex/exchange-contracts/artifacts/contracts/quackSwap-core/interfaces/IQuackSwapPair.sol/IQuackSwapPair.json'`.
 
 ## Attribution
 These contracts were adapted from these Uniswap repos: [uniswap-v2-core](https://github.com/Uniswap/uniswap-v2-core), [uniswap-v2-periphery](https://github.com/Uniswap/uniswap-v2-core), and [uniswap-lib](https://github.com/Uniswap/uniswap-lib).
@@ -51,7 +51,7 @@ The deployment script sets up `FeeCollector` to manage funding of the PNG stakin
 
 ### Revenue Distributor
 
-Portion of swap fees accumulated in `FeeCollector` is sent to `RevenueDistributor`. This contract allows anyone to call its `distributeToken` function to allocate revenue to pre-determined recipients. In default configuration, these recipients are the new DAO with 80% allocation, and Pangolin Foundation DAO with 20% allocation. The allocation can be later changed by the joint agreement of both DAOs, using the `JointMultisig` contract. Any future ERC20 revenue of the DAO **must** also be transferred to the Revenue Distributor.
+Portion of swap fees accumulated in `FeeCollector` is sent to `RevenueDistributor`. This contract allows anyone to call its `distributeToken` function to allocate revenue to pre-determined recipients. In default configuration, these recipients are the new DAO with 80% allocation, and QuackSwap Foundation DAO with 20% allocation. The allocation can be later changed by the joint agreement of both DAOs, using the `JointMultisig` contract. Any future ERC20 revenue of the DAO **must** also be transferred to the Revenue Distributor.
 
 ### Mini Chef
 

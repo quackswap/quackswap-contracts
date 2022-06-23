@@ -1,7 +1,7 @@
 const WGLMR = "0xAcc15dC74880C9944775448304B263D191c6077F";
 exports.WRAPPED_NATIVE_TOKEN = WGLMR;
 exports.PNG_SYMBOL = "PMB";
-exports.PNG_NAME = "Pangolin Moonbeam";
+exports.PNG_NAME = "QuackSwap Moonbeam";
 exports.TOTAL_SUPPLY = 230000000; // 230M
 exports.AIRDROP_AMOUNT = 11500000; // 11.5M or 5% of max supply
 exports.TIMELOCK_DELAY = 3 * 24 * 60 * 60; // 3 days

@@ -14,15 +14,15 @@ async function main() {
     const png = ethers.utils.getAddress(PNG_ADDRESS);
     const miniChefV2 = ethers.utils.getAddress(MINICHEF_V2_ADDRESS);
 
-    // Deploy PangolinVoteCalculator
-    const PangolinVoteCalculator = await ethers.getContractFactory("PangolinVoteCalculator");
-    const pangolinVoteCalculator = await PangolinVoteCalculator.deploy(
+    // Deploy QuackSwapVoteCalculator
+    const QuackSwapVoteCalculator = await ethers.getContractFactory("QuackSwapVoteCalculator");
+    const quackSwapVoteCalculator = await QuackSwapVoteCalculator.deploy(
       png,
       miniChefV2,
     );
-    await pangolinVoteCalculator.deployed();
+    await quackSwapVoteCalculator.deployed();
 
-    console.log("PangolinVoteCalculator address: ", pangolinVoteCalculator.address);
+    console.log("QuackSwapVoteCalculator address: ", quackSwapVoteCalculator.address);
 
     const endBalance = await deployer.getBalance();
     console.log("Deploy cost: ", initBalance.sub(endBalance).toString());

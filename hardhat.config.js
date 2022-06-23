@@ -15,7 +15,7 @@ const CHAINS = [
     rpc_uri: 'https://rpc.bt.io/'
   }
 ]
-// Create hardhat networks from @pangolindex/sdk
+// Create hardhat networks from @quackswapdex/sdk
 let networksFromSdk = {};
 for (const chain of CHAINS) {
   networksFromSdk[chain.id] = {
@@ -101,7 +101,7 @@ module.exports = {
       "contracts/mini-chef-zapper/MiniChefV2Zapper.sol": {
         version: "0.8.11"
       },
-      "contracts/pangolin-token/PNG.sol": {
+      "contracts/quackswap-token/QUACK.sol": {
         version: "0.5.16",
         settings: { // For mocking
           outputSelection: {

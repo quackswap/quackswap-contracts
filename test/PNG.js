@@ -19,7 +19,7 @@ describe('PNG', function () {
   });
 
   beforeEach(async function () {
-    this.png = await this.PNG.deploy(TOTAL_SUPPLY, AIRDROP_SUPPLY, "PNG", "Pangolin");
+    this.png = await this.PNG.deploy(TOTAL_SUPPLY, AIRDROP_SUPPLY, "PNG", "QuackSwap");
     await this.png.deployed();
   });
 
@@ -41,7 +41,7 @@ describe('PNG', function () {
       expect(await this.png.symbol()).to.equal("PNG");
     });
     it('arg 4: name', async function () {
-      expect(await this.png.name()).to.equal("Pangolin");
+      expect(await this.png.name()).to.equal("QuackSwap");
     });
     it('default: hardcapped', async function () {
       expect(await this.png.hardcapped()).to.be.false;

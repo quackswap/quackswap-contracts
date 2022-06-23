@@ -10,7 +10,7 @@ import "../Claimable.sol";
  * @title Allocation Vester
  * @notice Allows allocating and distributing tokens to recipients by vesting
  * it for arbitrary durations for each recipient
- * @author shung for Pangolin
+ * @author shung for QuackSwap
  */
 contract AllocationVester is Claimable {
     using SafeERC20 for IERC20;

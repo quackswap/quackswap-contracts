@@ -61,7 +61,7 @@ describe('Governance', function () {
         this.LpManager = await ethers.getContractFactory("LiquidityPoolManagerV2");
         this.Community = await ethers.getContractFactory("CommunityTreasury");
 
-        this.Factory = await ethers.getContractFactory("PangolinFactory");
+        this.Factory = await ethers.getContractFactory("QuackSwapFactory");
 
         this.MockPairAvax = await ethers.getContractFactory("contracts/MockContract.sol:MockContract");
     });

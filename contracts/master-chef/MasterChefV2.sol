@@ -409,6 +409,4 @@ contract MiniChefV2 is Ownable {
         rewardPerSecond = _rewardPerSecond;
         emit LogRewardPerSecond(_rewardPerSecond);
     }
-
-
 }

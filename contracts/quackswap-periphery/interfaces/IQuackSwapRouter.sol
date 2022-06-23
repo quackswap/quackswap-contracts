@@ -1,8 +1,8 @@
 pragma solidity >=0.6.2;
 
-interface IPangolinRouter {
+interface IQuackSwapRouter {
     function factory() external pure returns (address);
-    function WAVAX() external pure returns (address);
+    function WBTT() external pure returns (address);
 
     function addLiquidity(
         address tokenA,
@@ -14,14 +14,14 @@ interface IPangolinRouter {
         address to,
         uint deadline
     ) external returns (uint amountA, uint amountB, uint liquidity);
-    function addLiquidityAVAX(
+    function addLiquidityWBTT(
         address token,
         uint amountTokenDesired,
         uint amountTokenMin,
-        uint amountAVAXMin,
+        uint amountBTTMin,
         address to,
         uint deadline
-    ) external payable returns (uint amountToken, uint amountAVAX, uint liquidity);
+    ) external payable returns (uint amountToken, uint amountBTT, uint liquidity);
     function removeLiquidity(
         address tokenA,
         address tokenB,
@@ -31,14 +31,14 @@ interface IPangolinRouter {
         address to,
         uint deadline
     ) external returns (uint amountA, uint amountB);
-    function removeLiquidityAVAX(
+    function removeLiquidityBTT(
         address token,
         uint liquidity,
         uint amountTokenMin,
-        uint amountAVAXMin,
+        uint amountBTTMin,
         address to,
         uint deadline
-    ) external returns (uint amountToken, uint amountAVAX);
+    ) external returns (uint amountToken, uint amountBTT);
     function removeLiquidityWithPermit(
         address tokenA,
         address tokenB,
@@ -49,15 +49,15 @@ interface IPangolinRouter {
         uint deadline,
         bool approveMax, uint8 v, bytes32 r, bytes32 s
     ) external returns (uint amountA, uint amountB);
-    function removeLiquidityAVAXWithPermit(
+    function removeLiquidityBTTWithPermit(
         address token,
         uint liquidity,
         uint amountTokenMin,
-        uint amountAVAXMin,
+        uint amountBTTMin,
         address to,
         uint deadline,
         bool approveMax, uint8 v, bytes32 r, bytes32 s
-    ) external returns (uint amountToken, uint amountAVAX);
+    ) external returns (uint amountToken, uint amountBTT);
     function swapExactTokensForTokens(
         uint amountIn,
         uint amountOutMin,
@@ -72,17 +72,17 @@ interface IPangolinRouter {
         address to,
         uint deadline
     ) external returns (uint[] memory amounts);
-    function swapExactAVAXForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline)
+    function swapExactBTTForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline)
         external
         payable
         returns (uint[] memory amounts);
-    function swapTokensForExactAVAX(uint amountOut, uint amountInMax, address[] calldata path, address to, uint deadline)
+    function swapTokensForExactBTT(uint amountOut, uint amountInMax, address[] calldata path, address to, uint deadline)
         external
         returns (uint[] memory amounts);
-    function swapExactTokensForAVAX(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline)
+    function swapExactTokensForBTT(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline)
         external
         returns (uint[] memory amounts);
-    function swapAVAXForExactTokens(uint amountOut, address[] calldata path, address to, uint deadline)
+    function swapBTTForExactTokens(uint amountOut, address[] calldata path, address to, uint deadline)
         external
         payable
         returns (uint[] memory amounts);
@@ -93,23 +93,23 @@ interface IPangolinRouter {
     function getAmountsOut(uint amountIn, address[] calldata path) external view returns (uint[] memory amounts);
     function getAmountsIn(uint amountOut, address[] calldata path) external view returns (uint[] memory amounts);
 
-    function removeLiquidityAVAXSupportingFeeOnTransferTokens(
+    function removeLiquidityBTTSupportingFeeOnTransferTokens(
         address token,
         uint liquidity,
         uint amountTokenMin,
-        uint amountAVAXMin,
+        uint amountBTTMin,
         address to,
         uint deadline
-    ) external returns (uint amountAVAX);
-    function removeLiquidityAVAXWithPermitSupportingFeeOnTransferTokens(
+    ) external returns (uint amountBTT);
+    function removeLiquidityBTTWithPermitSupportingFeeOnTransferTokens(
         address token,
         uint liquidity,
         uint amountTokenMin,
-        uint amountAVAXMin,
+        uint amountBTTMin,
         address to,
         uint deadline,
         bool approveMax, uint8 v, bytes32 r, bytes32 s
-    ) external returns (uint amountAVAX);
+    ) external returns (uint amountBTT);
 
     function swapExactTokensForTokensSupportingFeeOnTransferTokens(
         uint amountIn,
@@ -118,13 +118,13 @@ interface IPangolinRouter {
         address to,
         uint deadline
     ) external;
-    function swapExactAVAXForTokensSupportingFeeOnTransferTokens(
+    function swapExactBTTForTokensSupportingFeeOnTransferTokens(
         uint amountOutMin,
         address[] calldata path,
         address to,
         uint deadline
     ) external payable;
-    function swapExactTokensForAVAXSupportingFeeOnTransferTokens(
+    function swapExactTokensForBTTSupportingFeeOnTransferTokens(
         uint amountIn,
         uint amountOutMin,
         address[] calldata path,

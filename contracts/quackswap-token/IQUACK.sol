@@ -1,6 +1,6 @@
 pragma solidity >=0.5.0;
 
-interface IPangolinERC20 {
+interface IQUACK {
     event Approval(address indexed owner, address indexed spender, uint value);
     event Transfer(address indexed from, address indexed to, uint value);
 
@@ -20,4 +20,5 @@ interface IPangolinERC20 {
     function nonces(address owner) external view returns (uint);
 
     function permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s) external;
+    function mint(address dst, uint rawAmount) external returns (bool);
 }

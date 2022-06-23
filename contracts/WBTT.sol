@@ -17,9 +17,9 @@
 
 pragma solidity >=0.4.22 <0.6;
 
-contract WAVAX {
-    string public name     = "Wrapped AVAX";
-    string public symbol   = "WAVAX";
+contract WBTT {
+    string public name     = "Wrapped BTT";
+    string public symbol   = "WBTT";
     uint8  public decimals = 18;
 
     event  Approval(address indexed src, address indexed guy, uint wad);

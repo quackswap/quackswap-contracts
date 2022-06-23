@@ -2,7 +2,7 @@
 pragma solidity 0.8.9;
 
 
-interface IMiniChef {
+interface IMasterChef {
 
     function poolLength() external view returns (uint256 poolLength);
     function lpTokens() external view;

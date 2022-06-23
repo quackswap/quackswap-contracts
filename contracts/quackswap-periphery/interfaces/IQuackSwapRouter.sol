@@ -14,7 +14,7 @@ interface IQuackSwapRouter {
         address to,
         uint deadline
     ) external returns (uint amountA, uint amountB, uint liquidity);
-    function addLiquidityWBTT(
+    function addLiquidityBTT(
         address token,
         uint amountTokenDesired,
         uint amountTokenMin,

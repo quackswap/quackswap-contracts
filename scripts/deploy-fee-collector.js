@@ -1,5 +1,6 @@
 const { ethers } = require('hardhat');
 
+// TODO check addresses
 const STAKING_CONTRACT = "0x88afdaE1a9F58Da3E68584421937E5F564A0135b";
 const MULTISIG = "0x66c048d27aFB5EE59E4C07101A483654246A4eda"; // gnosis
 const FACTORY = "0xefa94DE7a4656D787667C749f7E1223D71E9FD88";

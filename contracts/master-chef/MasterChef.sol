@@ -17,10 +17,10 @@ interface IMigratorChef {
     function migrate(IERC20 token) external returns (IERC20);
 }
 
-/// @notice The (older) MiniChefV2 contract gives out a reward tokens per block.
+/// @notice The (older) MasterChef contract gives out a reward tokens per block.
 // The reward tokens must be topped up regularly to ensure users do not accrue non-existent rewards
 // This implementation aims to avoid that issue by using a dynamic window of funding
-contract MiniChefV2 is Ownable {
+contract MasterChef is Ownable {
     using BoringMath for uint256;
     using BoringMath128 for uint128;
     using BoringERC20 for IERC20;
@@ -96,7 +96,7 @@ contract MiniChefV2 is Ownable {
         require(
             _rewardToken != address(0)
             && _firstOwner != address(0),
-            "MiniChefV2::Cannot construct with zero address"
+            "MasterChef::Cannot construct with zero address"
         );
 
         REWARD = IQuackSwapERC20(_rewardToken);
@@ -135,7 +135,7 @@ contract MiniChefV2 is Ownable {
         require(
             _allocPoints.length == _lpTokens.length
             && _lpTokens.length == _rewarders.length,
-            "MiniChefV2: invalid parameter lengths"
+            "MasterChef: invalid parameter lengths"
         );
 
         massUpdateAllPools();
@@ -178,7 +178,7 @@ contract MiniChefV2 is Ownable {
             pids.length == allocPoints.length
             && allocPoints.length == rewarders.length
             && rewarders.length == overwrites.length,
-            "MiniChefV2: invalid parameter lengths"
+            "MasterChef: invalid parameter lengths"
         );
 
         massUpdateAllPools();
@@ -204,7 +204,7 @@ contract MiniChefV2 is Ownable {
     /// @notice Set the `migrator` contract. Can only be called by the owner.
     /// @param _migrator The contract address to set.
     function setMigrator(IMigratorChef _migrator) public onlyOwner {
-        require(!migrationDisabled, "MiniChefV2: migration has been disabled");
+        require(!migrationDisabled, "MasterChef: migration has been disabled");
         migrator = _migrator;
         emit MigratorSet(address(_migrator));
     }
@@ -219,13 +219,13 @@ contract MiniChefV2 is Ownable {
     /// @notice Migrate LP token to another LP contract through the `migrator` contract.
     /// @param _pid The index of the pool. See `poolInfo`.
     function migrate(uint256 _pid) public onlyOwner {
-        require(!migrationDisabled, "MiniChefV2: migration has been disabled");
-        require(address(migrator) != address(0), "MiniChefV2: no migrator set");
+        require(!migrationDisabled, "MasterChef: migration has been disabled");
+        require(address(migrator) != address(0), "MasterChef: no migrator set");
         IERC20 _lpToken = lpToken[_pid];
         uint256 bal = _lpToken.balanceOf(address(this));
         _lpToken.approve(address(migrator), bal);
         IERC20 newLpToken = migrator.migrate(_lpToken);
-        require(bal == newLpToken.balanceOf(address(this)), "MiniChefV2: migrated balance must match");
+        require(bal == newLpToken.balanceOf(address(this)), "MasterChef: migrated balance must match");
         lpToken[_pid] = newLpToken;
         emit Migrate(_pid);
     }

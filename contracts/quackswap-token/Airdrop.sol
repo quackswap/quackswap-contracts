@@ -1,24 +1,24 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity ^0.8.0;
 
-interface IPNG {
+interface IQUACK {
     function balanceOf(address account) external view returns (uint);
     function transfer(address dst, uint rawAmount) external returns (bool);
 }
 
 /**
- *  Contract for administering the Airdrop of xPNG to PNG holders.
- *  Arbitrary amount PNG will be made available in the airdrop. After the
- *  Airdrop period is over, all unclaimed PNG will be transferred to the
+ *  Contract for administering the Airdrop of xQUACK to QUACK holders.
+ *  Arbitrary amount QUACK will be made available in the airdrop. After the
+ *  Airdrop period is over, all unclaimed QUACK will be transferred to the
  *  community treasury.
  */
 contract Airdrop {
-    address public immutable png;
+    address public immutable quack;
     address public owner;
     address public whitelister;
     address public remainderDestination;
 
-    // amount of PNG to transfer
+    // amount of QUACK to transfer
     mapping (address => uint) public withdrawAmount;
 
     uint public totalAllocated;
@@ -30,31 +30,31 @@ contract Airdrop {
      * Initializes the contract. Sets token addresses, owner, and leftover token
      * destination. Claiming period is not enabled.
      *
-     * @param png_ the PNG token contract address
+     * @param quack_ the QUACK token contract address
      * @param owner_ the privileged contract owner
-     * @param remainderDestination_ address to transfer remaining PNG to when
+     * @param remainderDestination_ address to transfer remaining QUACK to when
      *     claiming ends. Should be community treasury.
      */
     constructor(
         uint supply_,
-        address png_,
+        address quack_,
         address owner_,
         address remainderDestination_
     ) {
         require(owner_ != address(0), 'Airdrop::Construct: invalid new owner');
-        require(png_ != address(0), 'Airdrop::Construct: invalid png address');
+        require(quack_ != address(0), 'Airdrop::Construct: invalid quack address');
 
         airdropSupply = supply_;
-        png = png_;
+        quack = quack_;
         owner = owner_;
         remainderDestination = remainderDestination_;
     }
 
     /**
-     * Changes the address that receives the remaining PNG at the end of the
+     * Changes the address that receives the remaining QUACK at the end of the
      * claiming period. Can only be set by the contract owner.
      *
-     * @param remainderDestination_ address to transfer remaining PNG to when
+     * @param remainderDestination_ address to transfer remaining QUACK to when
      *     claiming ends.
      */
     function setRemainderDestination(address remainderDestination_) external {
@@ -98,15 +98,15 @@ contract Airdrop {
     }
 
     /**
-     * Enable the claiming period and allow user to claim PNG. Before
-     * activation, this contract must have a PNG balance equal to airdropSupply
-     * All claimable PNG tokens must be whitelisted before claiming is enabled.
+     * Enable the claiming period and allow user to claim QUACK. Before
+     * activation, this contract must have a QUACK balance equal to airdropSupply
+     * All claimable QUACK tokens must be whitelisted before claiming is enabled.
      * Only callable by the owner.
      */
     function allowClaiming() external {
-        require(IPNG(png).balanceOf(
+        require(IQUACK(quack).balanceOf(
             address(this)) >= airdropSupply,
-            'Airdrop::allowClaiming: incorrect PNG supply'
+            'Airdrop::allowClaiming: incorrect QUACK supply'
         );
         require(msg.sender == owner, 'Airdrop::allowClaiming: unauthorized');
         claimingAllowed = true;
@@ -114,7 +114,7 @@ contract Airdrop {
     }
 
     /**
-     * End the claiming period. All unclaimed PNG will be transferred to the address
+     * End the claiming period. All unclaimed QUACK will be transferred to the address
      * specified by remainderDestination. Can only be called by the owner.
      */
     function endClaiming() external {
@@ -124,9 +124,9 @@ contract Airdrop {
         claimingAllowed = false;
 
         // Transfer remainder
-        uint amount = IPNG(png).balanceOf(address(this));
+        uint amount = IQUACK(quack).balanceOf(address(this));
         require(
-            IPNG(png).transfer(remainderDestination, amount),
+            IQUACK(quack).transfer(remainderDestination, amount),
             'Airdrop::endClaiming: Transfer failed'
         );
 
@@ -134,8 +134,8 @@ contract Airdrop {
     }
 
     /**
-     * Withdraw your PNG. In order to qualify for a withdrawal, the
-     * caller's address must be whitelisted. All PNG must be claimed at
+     * Withdraw your QUACK. In order to qualify for a withdrawal, the
+     * caller's address must be whitelisted. All QUACK must be claimed at
      * once. Only the full amount can be claimed and only one claim is
      * allowed per user.
      */
@@ -143,28 +143,28 @@ contract Airdrop {
         require(claimingAllowed, 'Airdrop::claim: Claiming is not allowed');
         require(
             withdrawAmount[msg.sender] > 0,
-            'Airdrop::claim: No PNG to claim'
+            'Airdrop::claim: No QUACK to claim'
         );
 
         uint amountToClaim = withdrawAmount[msg.sender];
         withdrawAmount[msg.sender] = 0;
 
         require(
-            IPNG(png).transfer(msg.sender, amountToClaim),
+            IQUACK(quack).transfer(msg.sender, amountToClaim),
             'Airdrop::claim: Transfer failed'
         );
 
-        emit PngClaimed(msg.sender, amountToClaim);
+        emit QuackClaimed(msg.sender, amountToClaim);
     }
 
     /**
      * Whitelist multiple addresses in one call.
      * All parameters are arrays. Each array must be the same length. Each index
-     * corresponds to one (address, png) tuple. Callable by the owner or whitelister.
+     * corresponds to one (address, quack) tuple. Callable by the owner or whitelister.
      */
     function whitelistAddresses(
         address[] memory addrs,
-        uint[] memory pngOuts
+        uint[] memory quackOuts
     ) external {
         require(
             !claimingAllowed,
@@ -175,23 +175,23 @@ contract Airdrop {
             'Airdrop::whitelistAddresses: unauthorized'
         );
         require(
-            addrs.length == pngOuts.length,
+            addrs.length == quackOuts.length,
             'Airdrop::whitelistAddresses: incorrect array length'
         );
         for (uint i; i < addrs.length; ++i) {
             address addr = addrs[i];
-            uint pngOut = pngOuts[i];
-            totalAllocated = totalAllocated + pngOut - withdrawAmount[addr];
-            withdrawAmount[addr] = pngOut;
+            uint quackOut = quackOuts[i];
+            totalAllocated = totalAllocated + quackOut - withdrawAmount[addr];
+            withdrawAmount[addr] = quackOut;
         }
         require(
             totalAllocated <= airdropSupply,
-            'Airdrop::whitelistAddresses: Exceeds PNG allocation'
+            'Airdrop::whitelistAddresses: Exceeds QUACK allocation'
         );
     }
 
     // Events
     event ClaimingAllowed();
     event ClaimingOver();
-    event PngClaimed(address claimer, uint amount);
+    event QuackClaimed(address claimer, uint amount);
 }

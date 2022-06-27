@@ -1,9 +1,9 @@
 const { ethers } = require("hardhat");
 const fs = require("fs");
-const { FOUNDATION_MULTISIG } = require("../constants/shared.js");
+// const { FOUNDATION_MULTISIG } = require("../constants/shared.js");
 const {
-    PNG_SYMBOL,
-    PNG_NAME,
+    QUACK_SYMBOL,
+    QUACK_NAME,
     TOTAL_SUPPLY,
     USE_GNOSIS_SAFE,
     PROPOSAL_THRESHOLD,
@@ -83,10 +83,10 @@ async function main() {
 
     // Deploy BTT if not defined
     if (WRAPPED_NATIVE_TOKEN === undefined) {
-        var nativeToken = (await deploy("WAVAX", [])).address;
+        var nativeToken = (await deploy("WBTT", [])).address;
     } else {
         var nativeToken = WRAPPED_NATIVE_TOKEN;
-        console.log(nativeToken, ": WAVAX");
+        console.log(nativeToken, ": WBTT");
     }
 
     /**************
@@ -94,68 +94,68 @@ async function main() {
      **************/
 
     // Deploy PNG
-    const png = await deploy("Png", [
+    const quack = await deploy("QUACK", [
         ethers.utils.parseUnits(TOTAL_SUPPLY.toString(), 18),
         ethers.utils.parseUnits(AIRDROP_AMOUNT.toString(), 18),
-        PNG_SYMBOL,
-        PNG_NAME,
+        QUACK_SYMBOL,
+        QUACK_NAME,
     ]);
 
     // Deploy this chain’s multisig
-    if (USE_GNOSIS_SAFE) {
-        const ethAdapter = new EthersAdapter({
-            ethers,
-            signer: deployer,
-        });
-        var Multisig = await SafeFactory.create({ ethAdapter });
-        var multisig = await Multisig.deploySafe(FOUNDATION_MULTISIG);
-        await confirmTransactionCount();
-        multisig.address = multisig.getAddress();
-        console.log(multisig.address, ": Gnosis");
-    } else {
-        var multisig = await deploy("MultiSigWalletWithDailyLimit", [
-            FOUNDATION_MULTISIG.owners,
-            FOUNDATION_MULTISIG.threshold,
-            0,
-        ]);
-    }
+    // if (USE_GNOSIS_SAFE) {
+    //     const ethAdapter = new EthersAdapter({
+    //         ethers,
+    //         signer: deployer,
+    //     });
+    //     var Multisig = await SafeFactory.create({ ethAdapter });
+    //     var multisig = await Multisig.deploySafe(FOUNDATION_MULTISIG);
+    //     await confirmTransactionCount();
+    //     multisig.address = multisig.getAddress();
+    //     console.log(multisig.address, ": Gnosis");
+    // } else {
+    //     var multisig = await deploy("MultiSigWalletWithDailyLimit", [
+    //         FOUNDATION_MULTISIG.owners,
+    //         FOUNDATION_MULTISIG.threshold,
+    //         0,
+    //     ]);
+    // }
 
-    const timelock = await deploy("Timelock", [
-        multisig.address,
-        TIMELOCK_DELAY,
-    ]);
+    // const timelock = await deploy("Timelock", [
+    //     multisig.address,
+    //     TIMELOCK_DELAY,
+    // ]);
     const factory = await deploy("QuackSwapFactory", [deployer.address]);
     const router = await deploy("QuackSwapRouter", [
         factory.address,
         nativeToken,
     ]);
-    const chef = await deploy("MiniChefV2", [png.address, deployer.address]);
-    const treasury = await deploy("CommunityTreasury", [png.address]);
-    const staking = await deploy("StakingRewards", [png.address, png.address]);
+    const chef = await deploy("MasterChef", [quack.address, deployer.address]);
+    const treasury = await deploy("CommunityTreasury", [quack.address]);
+    const staking = await deploy("StakingRewards", [quack.address, quack.address]);
 
     // Deploy Airdrop
-    const airdrop = await deploy("Airdrop", [
-        ethers.utils.parseUnits(AIRDROP_AMOUNT.toString(), 18),
-        png.address,
-        multisig.address,
-        treasury.address,
-    ]);
+    // const airdrop = await deploy("Airdrop", [
+    //     ethers.utils.parseUnits(AIRDROP_AMOUNT.toString(), 18),
+    //     png.address,
+    //     multisig.address,
+    //     treasury.address,
+    // ]);
 
     // Deploy TreasuryVester
-    var vesterAllocations = [];
-    for (let i = 0; i < VESTER_ALLOCATIONS.length; i++) {
-        vesterAllocations.push([
-            eval(VESTER_ALLOCATIONS[i].recipient + ".address"),
-            VESTER_ALLOCATIONS[i].allocation,
-            VESTER_ALLOCATIONS[i].isMiniChef,
-        ]);
-    }
-    const vester = await deploy("TreasuryVester", [
-        png.address, // vested token
-        ethers.utils.parseUnits((TOTAL_SUPPLY - AIRDROP_AMOUNT).toString(), 18),
-        vesterAllocations,
-        multisig.address,
-    ]);
+    // var vesterAllocations = [];
+    // for (let i = 0; i < VESTER_ALLOCATIONS.length; i++) {
+    //     vesterAllocations.push([
+    //         eval(VESTER_ALLOCATIONS[i].recipient + ".address"),
+    //         VESTER_ALLOCATIONS[i].allocation,
+    //         VESTER_ALLOCATIONS[i].isMiniChef,
+    //     ]);
+    // }
+    // const vester = await deploy("TreasuryVester", [
+    //     png.address, // vested token
+    //     ethers.utils.parseUnits((TOTAL_SUPPLY - AIRDROP_AMOUNT).toString(), 18),
+    //     vesterAllocations,
+    //     multisig.address,
+    // ]);
 
     /*****************
      * FEE COLLECTOR *
@@ -169,9 +169,9 @@ async function main() {
         staking.address,
         chef.address,
         0, // chef pid for dummy PGL
-        multisig.address, // treasury
-        timelock.address, // governor
-        multisig.address // admin
+        treasury.address, // treasury
+        deployer.address, // governor
+        deployer.address // admin
     ]);
 
     // Deploy DummyERC20 for diverting some PNG emissions to PNG staking
@@ -184,33 +184,33 @@ async function main() {
 
     console.log("\n===============\n CONFIGURATION \n===============");
 
-    await treasury.transferOwnership(timelock.address);
-    await confirmTransactionCount();
-    console.log("Transferred CommunityTreasury ownership to Timelock.");
+    // await treasury.transferOwnership(timelock.address);
+    // await confirmTransactionCount();
+    // console.log("Transferred CommunityTreasury ownership to Timelock.");
 
-    await png.setMinter(vester.address);
+    await quack.setMinter(chef.address);
     await confirmTransactionCount();
-    console.log("Transferred PNG minter role to TreasuryVester.");
+    console.log("Transferred QUACK minter role to to MasterChef.");
 
-    await png.setAdmin(timelock.address);
-    await confirmTransactionCount();
-    console.log("Transferred PNG ownership to Timelock.");
+    // await quack.setAdmin(timelock.address);
+    // await confirmTransactionCount();
+    // console.log("Transferred PNG ownership to Timelock.");
 
-    await png.transfer(
-        airdrop.address,
-        ethers.utils.parseUnits(AIRDROP_AMOUNT.toString(), 18)
-    );
-    await confirmTransactionCount();
-    console.log(
-        "Transferred",
-        AIRDROP_AMOUNT.toString(),
-        PNG_SYMBOL,
-        "to Airdrop."
-    );
+    // await png.transfer(
+    //     airdrop.address,
+    //     ethers.utils.parseUnits(AIRDROP_AMOUNT.toString(), 18)
+    // );
+    // await confirmTransactionCount();
+    // console.log(
+    //     "Transferred",
+    //     AIRDROP_AMOUNT.toString(),
+    //     PNG_SYMBOL,
+    //     "to Airdrop."
+    // );
 
-    await vester.transferOwnership(timelock.address);
-    await confirmTransactionCount();
-    console.log("Transferred TreasuryVester ownership to Timelock.");
+    // await vester.transferOwnership(timelock.address);
+    // await confirmTransactionCount();
+    // console.log("Transferred TreasuryVester ownership to Timelock.");
 
     await dummyERC20.renounceOwnership();
     await confirmTransactionCount();
@@ -223,7 +223,7 @@ async function main() {
         ethers.constants.AddressZero
     );
     await confirmTransactionCount();
-    console.log("Added MiniChefV2 pool 0 for FeeCollector.");
+    console.log("Added MasterChef pool 0 for FeeCollector.");
 
     // deposit dummy PGL for the fee collector
     await dummyERC20.approve(chef.address, 100);
@@ -241,24 +241,24 @@ async function main() {
     await confirmTransactionCount();
     console.log("Set FeeCollector as the swap fee recipient.");
 
-    await factory.setFeeToSetter(multisig.address);
-    await confirmTransactionCount();
-    console.log("Transferred QuackSwapFactory ownership to Multisig.");
+    // await factory.setFeeToSetter(multisig.address);
+    // await confirmTransactionCount();
+    // console.log("Transferred QuackSwapFactory ownership to Multisig.");
 
     /********************
      * MINICHEFv2 FARMS *
      ********************/
 
-    await factory.createPair(png.address, nativeToken);
+    await factory.createPair(quack.address, nativeToken);
     await confirmTransactionCount();
-    var pngPair = await factory.getPair(png.address, nativeToken);
+    var quackPair = await factory.getPair(quack.address, nativeToken);
     await chef.addPool(
         WETH_PNG_FARM_ALLOCATION,
-        pngPair,
+        quackPair,
         ethers.constants.AddressZero
     );
     await confirmTransactionCount();
-    console.log("Added MiniChef pool 1 for BTT-PNG.");
+    console.log("Added MiniChef pool 1 for BTT-QUACK.");
 
     // create native token paired farms for tokens in INITIAL_FARMS
     for (let i = 0; i < INITIAL_FARMS.length; i++) {
@@ -279,13 +279,13 @@ async function main() {
             "more farms to MiniChefV2."
         );
 
-    await chef.addFunder(vester.address);
-    await confirmTransactionCount();
-    console.log("Added TreasuryVester as MiniChefV2 funder.");
+    // await chef.addFunder(vester.address);
+    // await confirmTransactionCount();
+    // console.log("Added TreasuryVester as MiniChefV2 funder.");
 
-    await chef.transferOwnership(multisig.address);
-    await confirmTransactionCount();
-    console.log("Transferred MiniChefV2 ownership to Multisig.");
+    // await chef.transferOwnership(multisig.address);
+    // await confirmTransactionCount();
+    // console.log("Transferred MiniChefV2 ownership to Multisig.");
 
     const endBalance = await deployer.getBalance();
     console.log(

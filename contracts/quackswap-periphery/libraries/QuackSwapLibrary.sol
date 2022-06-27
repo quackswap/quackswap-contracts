@@ -22,7 +22,7 @@ library QuackSwapLibrary {
                 hex'ff',
                 factory,
                 keccak256(abi.encodePacked(token0, token1)),
-                hex'40231f6b438bce0797c9ada29b718a87ea0a5cea3fe9a771abdd76bd41a3e545' // init code hash
+                hex'0930eb7c213a06b91961ea00e8360208b99a63d76d56552ddf073e6d4f54a8f3' // init code hash
             ))));
     }
 

@@ -15,7 +15,6 @@ const CHAINS = [
     rpc_uri: 'https://rpc.bt.io/'
   }
 ]
-// Create hardhat networks from @quackswapdex/sdk
 let networksFromSdk = {};
 for (const chain of CHAINS) {
   networksFromSdk[chain.id] = {

@@ -1,6 +1,6 @@
 exports.WRAPPED_NATIVE_TOKEN;
-exports.PNG_SYMBOL = "RT";
-exports.PNG_NAME = "RewardToken";
+exports.QUACK_SYMBOL = "QUACK";
+exports.QUACK_NAME = "Quack Swap Token";
 exports.TOTAL_SUPPLY = 230000000; // 230M
 exports.AIRDROP_AMOUNT = 11500000; // 11.5M or 5% of max supply
 exports.TIMELOCK_DELAY = 3 * 24 * 60 * 60; // 3 days
@@ -8,8 +8,7 @@ exports.USE_GNOSIS_SAFE = false;
 exports.PROPOSAL_THRESHOLD = 1000000; // 1M
 exports.PNG_STAKING_ALLOCATION = 500, // 5x weight in minichef
 exports.WETH_PNG_FARM_ALLOCATION = 3000, // 30x weight
-exports.INITIAL_FARMS = [
-];
+exports.INITIAL_FARMS = [];
 exports.VESTER_ALLOCATIONS = [
   {
     recipient: "treasury", // community treasury

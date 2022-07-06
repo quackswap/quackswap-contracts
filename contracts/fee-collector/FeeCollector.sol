@@ -15,7 +15,7 @@ interface IQuackSwapPair {
     function balanceOf(address owner) external view returns (uint);
 }
 
-interface IMiniChef {
+interface IMasterChef {
     function harvest(uint256 pid, address to) external;
 }
 
@@ -49,8 +49,8 @@ contract FeeCollector is AccessControl, Pausable {
     uint256 public treasuryFee = 1500; // 15%
     uint256 public harvestIncentive = 10; // 0.1%
 
-    address public miniChef;
-    uint256 public miniChefPoolId;
+    address public masterChef;
+    uint256 public masterChefPoolId;
 
     mapping(address => bool) public isRecoverable;
 
@@ -59,7 +59,7 @@ contract FeeCollector is AccessControl, Pausable {
         address _factory,
         bytes32 _initHash,
         address _stakingRewards,
-        address _miniChef,
+        address _masterChef,
         uint256 _pid,
         address _treasury,
         address _governor,
@@ -75,8 +75,8 @@ contract FeeCollector is AccessControl, Pausable {
         stakingRewards = _stakingRewards;
         stakingRewardsRewardToken = _stakingRewardsRewardToken;
 
-        miniChef = _miniChef;
-        miniChefPoolId = _pid;
+        masterChef = _masterChef;
+        masterChefPoolId = _pid;
         treasury = _treasury;
 
         _grantRole(DEFAULT_ADMIN_ROLE, _admin);
@@ -136,17 +136,17 @@ contract FeeCollector is AccessControl, Pausable {
         treasury = _treasury;
     }
 
-    /// @notice Sets the MiniChef address to collect rewards from
-    /// @param _miniChef - New MiniChef address
-    function setMiniChef(address _miniChef) external onlyRole(DEFAULT_ADMIN_ROLE) {
-        require(_miniChef != address(0));
-        miniChef = _miniChef;
+    /// @notice Sets the MasterChef address to collect rewards from
+    /// @param _masterChef - New MasterChef address
+    function setMasterChef(address _masterChef) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(_masterChef != address(0));
+        masterChef = _masterChef;
     }
 
-    /// @notice Sets the MiniChef pool used to accumulate rewards from emissions
-    /// @param _pid - ID of the pool on MiniChef
-    function setMiniChefPool(uint256 _pid) external onlyRole(DEFAULT_ADMIN_ROLE) {
-        miniChefPoolId = _pid;
+    /// @notice Sets the MasterChef pool used to accumulate rewards from emissions
+    /// @param _pid - ID of the pool on MasterChef
+    function setMasterChefPool(uint256 _pid) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        masterChefPoolId = _pid;
     }
 
     /// @notice Proxy function to set reward duration on the staking contract
@@ -225,11 +225,11 @@ contract FeeCollector is AccessControl, Pausable {
     /// @notice - Converts all the LP tokens specified to the rewards token and
     /// transfers it to the staking contract, treasury, and caller
     /// @param liquidityPairs - list of all the pairs to harvest
-    /// @param claimMiniChef - whether to also harvest additional rewards accrued via MiniChef
+    /// @param claimMasterChef - whether to also harvest additional rewards accrued via MasterChef
     /// @param minFinalBalance - required min png balance after the buybacks (slippage control)
     function harvest(
         IQuackSwapPair[] calldata liquidityPairs,
-        bool claimMiniChef,
+        bool claimMasterChef,
         uint256 minFinalBalance
     ) external whenNotPaused onlyRole(HARVEST_ROLE) {
         address _stakingRewardsRewardToken = stakingRewardsRewardToken; // Gas savings
@@ -238,8 +238,8 @@ contract FeeCollector is AccessControl, Pausable {
             _convertLiquidity(liquidityPairs, _stakingRewardsRewardToken);
         }
 
-        if (claimMiniChef) {
-            IMiniChef(miniChef).harvest(miniChefPoolId, address(this));
+        if (claimMasterChef) {
+            IMasterChef(masterChef).harvest(masterChefPoolId, address(this));
         }
 
         uint256 finalBalance = IERC20(_stakingRewardsRewardToken).balanceOf(address(this));

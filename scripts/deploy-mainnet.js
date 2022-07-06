@@ -147,7 +147,7 @@ async function main() {
     //     vesterAllocations.push([
     //         eval(VESTER_ALLOCATIONS[i].recipient + ".address"),
     //         VESTER_ALLOCATIONS[i].allocation,
-    //         VESTER_ALLOCATIONS[i].isMiniChef,
+    //         VESTER_ALLOCATIONS[i].isMasterChef,
     //     ]);
     // }
     // const vester = await deploy("TreasuryVester", [
@@ -216,7 +216,7 @@ async function main() {
     await confirmTransactionCount();
     console.log("Renounced DummyERC20 ownership.");
 
-    // add dummy PGL to minichef
+    // add dummy PGL to masterchef
     await chef.addPool(
         PNG_STAKING_ALLOCATION,
         dummyERC20.address,
@@ -229,12 +229,12 @@ async function main() {
     await dummyERC20.approve(chef.address, 100);
     await confirmTransactionCount();
     await chef.deposit(
-        0, // minichef pid
+        0, // masterchef pid
         100, // amount
         feeCollector.address // deposit to address
     );
     await confirmTransactionCount();
-    console.log("Deposited DummyERC20 to MiniChefV2 pool 0.");
+    console.log("Deposited DummyERC20 to MasterChef pool 0.");
 
     // change swap fee recipient to fee collector
     await factory.setFeeTo(feeCollector.address);
@@ -246,7 +246,7 @@ async function main() {
     // console.log("Transferred QuackSwapFactory ownership to Multisig.");
 
     /********************
-     * MINICHEFv2 FARMS *
+     * MASTERCHEF FARMS *
      ********************/
 
     await factory.createPair(quack.address, nativeToken);
@@ -258,7 +258,7 @@ async function main() {
         ethers.constants.AddressZero
     );
     await confirmTransactionCount();
-    console.log("Added MiniChef pool 1 for BTT-QUACK.");
+    console.log("Added MasterChef pool 1 for BTT-QUACK.");
 
     // create native token paired farms for tokens in INITIAL_FARMS
     for (let i = 0; i < INITIAL_FARMS.length; i++) {
@@ -276,16 +276,16 @@ async function main() {
         console.log(
             "Added",
             (pools.length - 2).toString(),
-            "more farms to MiniChefV2."
+            "more farms to MasterChef."
         );
 
     // await chef.addFunder(vester.address);
     // await confirmTransactionCount();
-    // console.log("Added TreasuryVester as MiniChefV2 funder.");
+    // console.log("Added TreasuryVester as MasterChef funder.");
 
     // await chef.transferOwnership(multisig.address);
     // await confirmTransactionCount();
-    // console.log("Transferred MiniChefV2 ownership to Multisig.");
+    // console.log("Transferred MasterChef ownership to Multisig.");
 
     const endBalance = await deployer.getBalance();
     console.log(

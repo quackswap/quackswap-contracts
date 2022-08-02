@@ -1,12 +1,10 @@
 exports.WRAPPED_NATIVE_TOKEN;
-exports.QUACK_SYMBOL = "QUACK";
-exports.QUACK_NAME = "Quack Swap Token";
+exports.TREASURY_ADDRESS = '0xdC99EE37B3cDA0C89D5B31C66f7199B8e4893484';
+exports.QUACK_SYMBOL = "Example";
+exports.QUACK_NAME = "Example Token";
 exports.TOTAL_SUPPLY = 230000000; // 230M
 exports.AIRDROP_AMOUNT = 11500000; // 11.5M or 5% of max supply
-exports.TIMELOCK_DELAY = 3 * 24 * 60 * 60; // 3 days
-exports.USE_GNOSIS_SAFE = false;
 exports.PROPOSAL_THRESHOLD = 1000000; // 1M
-exports.PNG_STAKING_ALLOCATION = 500, // 5x weight in minichef
 exports.WETH_PNG_FARM_ALLOCATION = 3000, // 30x weight
 exports.INITIAL_FARMS = [];
 exports.VESTER_ALLOCATIONS = [
@@ -20,7 +18,7 @@ exports.VESTER_ALLOCATIONS = [
   },
   {
     recipient: "chef", // MiniChef
-    allocation: 6053, // 57.5% LPs & PNG Staking
+    allocation: 6053, // 57.5% LPs 
     isMiniChef: true
   }
 ];

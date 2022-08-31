@@ -1,24 +1,9 @@
 exports.WRAPPED_NATIVE_TOKEN;
 exports.TREASURY_ADDRESS = '0xdC99EE37B3cDA0C89D5B31C66f7199B8e4893484';
-exports.QUACK_SYMBOL = "Example";
-exports.QUACK_NAME = "Example Token";
+exports.QUACK_SYMBOL = "QUACK";
+exports.QUACK_NAME = "QuackSwap Token";
 exports.TOTAL_SUPPLY = 230000000; // 230M
 exports.AIRDROP_AMOUNT = 11500000; // 11.5M or 5% of max supply
-exports.PROPOSAL_THRESHOLD = 1000000; // 1M
 exports.WETH_PNG_FARM_ALLOCATION = 3000, // 30x weight
 exports.INITIAL_FARMS = [];
-exports.VESTER_ALLOCATIONS = [
-  {
-    recipient: "treasury", // community treasury
-    allocation: 2105, // 20%
-  },
-  {
-    recipient: "multisig", // team
-    allocation: 1842, // 10% team + 5% vc investor + 2.5% advisory
-  },
-  {
-    recipient: "chef", // MiniChef
-    allocation: 6053, // 57.5% LPs 
-    isMiniChef: true
-  }
-];
+

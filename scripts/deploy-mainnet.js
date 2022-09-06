@@ -9,7 +9,7 @@ const {
     INITIAL_FARMS,
     AIRDROP_AMOUNT,
     TREASURY_ADDRESS,
-    WETH_PNG_FARM_ALLOCATION,
+    BTT_QUACK_FARM_ALLOCATION,
 } = require(`../constants/${network.name}.js`);
 
 var contracts = [];
@@ -116,7 +116,7 @@ async function main() {
     await confirmTransactionCount();
     var quackPair = await factory.getPair(quack.address, nativeToken);
     await chef.addPool(
-        WETH_PNG_FARM_ALLOCATION,
+        BTT_QUACK_FARM_ALLOCATION,
         quackPair,
         ethers.constants.AddressZero
     );

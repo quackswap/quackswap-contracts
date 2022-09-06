@@ -4,6 +4,6 @@ exports.QUACK_SYMBOL = "QUACK";
 exports.QUACK_NAME = "QuackSwap Token";
 exports.TOTAL_SUPPLY = 230000000; // 230M
 exports.AIRDROP_AMOUNT = 11500000; // 11.5M or 5% of max supply
-exports.WETH_PNG_FARM_ALLOCATION = 3000, // 30x weight
+exports.BTT_QUACK_FARM_ALLOCATION = 3000, // 30x weight
 exports.INITIAL_FARMS = [];
 

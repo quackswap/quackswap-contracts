@@ -14,17 +14,17 @@ describe('PoolCreation', function () {
         [ this.admin, this.unprivileged ] = await ethers.getSigners();
         this.QuackSwapFactory = await ethers.getContractFactory("QuackSwapFactory");
         this.QuackSwapRouter = await ethers.getContractFactory("QuackSwapRouter");
-        this.PNG = await ethers.getContractFactory("Png");
-        this.WAVAX = await ethers.getContractFactory("Png");
-        this.NATERC20 = await ethers.getContractFactory("Png");
-        this.JBXERC20 = await ethers.getContractFactory("Png");
+        this.PNG = await ethers.getContractFactory("QUACK");
+        this.WBTT = await ethers.getContractFactory("QUACK");
+        this.NATERC20 = await ethers.getContractFactory("QUACK");
+        this.JBXERC20 = await ethers.getContractFactory("QUACK");
     });
 
     beforeEach(async function () {
         // deploy some Tokens for test
         this.png = await this.PNG.deploy(TOTAL_SUPPLY, AIRDROP_SUPPLY, "PNG", "QuackSwap");
         await this.png.deployed();
-        this.wavax = await this.WAVAX.deploy(TOTAL_SUPPLY, AIRDROP_SUPPLY, "WAVAX", "Wrapped Avax");
+        this.wavax = await this.WBTT.deploy(TOTAL_SUPPLY, AIRDROP_SUPPLY, "WBTT", "Wrapped Avax");
         await this.wavax.deployed();
         this.naterc20 = await this.NATERC20.deploy(TOTAL_SUPPLY, AIRDROP_SUPPLY, "NAT", "NATERC20");
         await this.naterc20.deployed();
@@ -47,7 +47,7 @@ describe('PoolCreation', function () {
     describe("PoolCreation with AddLiquidity", function () {
         it("Router Variable", async function() {
             expect(await this.router.factory()).to.equal(this.factory.address);
-            expect(await this.router.WAVAX()).to.equal(this.wavax.address);
+            expect(await this.router.WBTT()).to.equal(this.wavax.address);
         });
         it("Create Pair", async function() {
             await expect(this.factory.createPair(this.png.address, this.wavax.address)).to.emit(this.factory, "PairCreated");

@@ -32,10 +32,10 @@ contract QUACK {
     bool public hardcapped;
 
     /// @notice Allowance amounts on behalf of others
-    mapping (address => mapping (address => uint96)) internal allowances;
+    mapping (address => mapping (address => uint256)) internal allowances;
 
     /// @notice Official record of token balances for each account
-    mapping (address => uint96) internal balances;
+    mapping (address => uint256) internal balances;
 
     /// @notice A record of each accounts delegate
     mapping (address => address) public delegates;
@@ -43,7 +43,7 @@ contract QUACK {
     /// @notice A checkpoint for marking number of votes from a given block
     struct Checkpoint {
         uint32 fromBlock;
-        uint96 votes;
+        uint256 votes;
     }
 
     /// @notice A record of votes checkpoints for each account, by index
@@ -95,10 +95,10 @@ contract QUACK {
      * @param _symbol EIP-20 token symbol for this token
      * @param _name EIP-20 token name for this token
      */
-    constructor(uint _maxSupply, uint initialSupply, string memory _symbol, string memory _name) public {
+    constructor(uint _maxSupply, uint256 initialSupply, string memory _symbol, string memory _name) public {
         maxSupply = _maxSupply;
         admin = msg.sender;
-        _mintTokens(admin, uint96(initialSupply));
+        _mintTokens(admin, initialSupply);
         symbol = _symbol;
         name = _name;
     }
@@ -118,17 +118,10 @@ contract QUACK {
      * @dev This will overwrite the approval amount for `spender`
      *  and is subject to issues noted [here](https://eips.ethereum.org/EIPS/eip-20#approve)
      * @param spender The address of the account which may transfer tokens
-     * @param rawAmount The number of tokens that are approved (2^256-1 means infinite)
+     * @param amount The number of tokens that are approved (2^256-1 means infinite)
      * @return Whether or not the approval succeeded
      */
-    function approve(address spender, uint rawAmount) external returns (bool) {
-        uint96 amount;
-        if (rawAmount == uint(-1)) {
-            amount = uint96(-1);
-        } else {
-            amount = safe96(rawAmount, "QUACK::approve: amount exceeds 96 bits");
-        }
-
+    function approve(address spender, uint256 amount) external returns (bool) {
         allowances[msg.sender][spender] = amount;
 
         emit Approval(msg.sender, spender, amount);
@@ -139,22 +132,15 @@ contract QUACK {
      * @notice Triggers an approval from owner to spends
      * @param owner The address to approve from
      * @param spender The address to be approved
-     * @param rawAmount The number of tokens that are approved (2^256-1 means infinite)
+     * @param amount The number of tokens that are approved (2^256-1 means infinite)
      * @param deadline The time at which to expire the signature
      * @param v The recovery byte of the signature
      * @param r Half of the ECDSA signature pair
      * @param s Half of the ECDSA signature pair
      */
-    function permit(address owner, address spender, uint rawAmount, uint deadline, uint8 v, bytes32 r, bytes32 s) external {
-        uint96 amount;
-        if (rawAmount == uint(-1)) {
-            amount = uint96(-1);
-        } else {
-            amount = safe96(rawAmount, "QUACK::permit: amount exceeds 96 bits");
-        }
-
+    function permit(address owner, address spender, uint256 amount, uint deadline, uint8 v, bytes32 r, bytes32 s) external {
         bytes32 domainSeparator = keccak256(abi.encode(DOMAIN_TYPEHASH, keccak256(bytes(name)), getChainId(), address(this)));
-        bytes32 structHash = keccak256(abi.encode(PERMIT_TYPEHASH, owner, spender, rawAmount, nonces[owner]++, deadline));
+        bytes32 structHash = keccak256(abi.encode(PERMIT_TYPEHASH, owner, spender, amount, nonces[owner]++, deadline));
         bytes32 digest = keccak256(abi.encodePacked("\x19\x01", domainSeparator, structHash));
         address signatory = ecrecover(digest, v, r, s);
         require(signatory != address(0), "QUACK::permit: invalid signature");
@@ -178,12 +164,11 @@ contract QUACK {
     /**
      * @notice Mint `amount` tokens to `dst`
      * @param dst The address of the destination account
-     * @param rawAmount The number of tokens to mint
+     * @param amount The number of tokens to mint
      * @return Whether or not the transfer succeeded
      */
-    function mint(address dst, uint rawAmount) external returns (bool) {
+    function mint(address dst, uint256 amount) external returns (bool) {
         require(msg.sender == minter && minter != address(0), "QUACK::mint: unauthorized");
-        uint96 amount = safe96(rawAmount, "QUACK::mint: amount exceeds 96 bits");
         _mintTokens(dst, amount);
         return true;
     }
@@ -191,11 +176,10 @@ contract QUACK {
     /**
      * @notice Transfer `amount` tokens from `msg.sender` to `dst`
      * @param dst The address of the destination account
-     * @param rawAmount The number of tokens to transfer
+     * @param amount The number of tokens to transfer
      * @return Whether or not the transfer succeeded
      */
-    function transfer(address dst, uint rawAmount) external returns (bool) {
-        uint96 amount = safe96(rawAmount, "QUACK::transfer: amount exceeds 96 bits");
+    function transfer(address dst, uint256 amount) external returns (bool) {
         _transferTokens(msg.sender, dst, amount);
         return true;
     }
@@ -204,16 +188,15 @@ contract QUACK {
      * @notice Transfer `amount` tokens from `src` to `dst`
      * @param src The address of the source account
      * @param dst The address of the destination account
-     * @param rawAmount The number of tokens to transfer
+     * @param amount The number of tokens to transfer
      * @return Whether or not the transfer succeeded
      */
-    function transferFrom(address src, address dst, uint rawAmount) external returns (bool) {
+    function transferFrom(address src, address dst, uint256 amount) external returns (bool) {
         address spender = msg.sender;
-        uint96 spenderAllowance = allowances[src][spender];
-        uint96 amount = safe96(rawAmount, "QUACK::approve: amount exceeds 96 bits");
+        uint256 spenderAllowance = allowances[src][spender];
 
-        if (spender != src && spenderAllowance != uint96(-1)) {
-            uint96 newAllowance = sub96(spenderAllowance, amount, "QUACK::transferFrom: transfer amount exceeds spender allowance");
+        if (spender != src && spenderAllowance != uint256(-1)) {
+            uint256 newAllowance = sub256(spenderAllowance, amount, "QUACK::transferFrom: transfer amount exceeds spender allowance");
             allowances[src][spender] = newAllowance;
 
             emit Approval(src, spender, newAllowance);
@@ -225,11 +208,10 @@ contract QUACK {
 
     /**
      * @notice Burn `amount` tokens of `msg.sender`
-     * @param rawAmount The number of tokens to burn
+     * @param amount The number of tokens to burn
      * @return Whether or not the burn succeeded
      */
-    function burn(uint rawAmount) external returns (bool) {
-        uint96 amount = safe96(rawAmount, "QUACK::burn: amount exceeds 96 bits");
+    function burn(uint256 amount) external returns (bool) {
         _burnTokens(msg.sender, amount);
         return true;
     }
@@ -237,16 +219,15 @@ contract QUACK {
     /**
      * @notice Burn `amount` tokens of `src`
      * @param src The address of the source account
-     * @param rawAmount The number of tokens to burn
+     * @param amount The number of tokens to burn
      * @return Whether or not the transfer succeeded
      */
-    function burnFrom(address src, uint rawAmount) external returns (bool) {
+    function burnFrom(address src, uint256 amount) external returns (bool) {
         address spender = msg.sender;
-        uint96 spenderAllowance = allowances[src][spender];
-        uint96 amount = safe96(rawAmount, "QUACK::burnFrom: amount exceeds 96 bits");
+        uint256 spenderAllowance = allowances[src][spender];
 
-        if (spender != src && spenderAllowance != uint96(-1)) {
-            uint96 newAllowance = sub96(spenderAllowance, amount, "QUACK::burnFrom: burn amount exceeds spender allowance");
+        if (spender != src && spenderAllowance != uint256(-1)) {
+            uint256 newAllowance = sub256(spenderAllowance, amount, "QUACK::burnFrom: burn amount exceeds spender allowance");
             allowances[src][spender] = newAllowance;
 
             emit Approval(src, spender, newAllowance);
@@ -290,7 +271,6 @@ contract QUACK {
         require(!hardcapped, "QUACK::setMaxSupply: function was disabled");
         require(msg.sender == admin, "QUACK::setMaxSupply: unauthorized");
         require(newMaxSupply >= totalSupply, "QUACK::setMaxSupply: circulating supply exceeds new max supply");
-        safe96(newMaxSupply, "QUACK::setMaxSupply: new max supply exceeds 96 bits");
         emit MaxSupplyChanged(maxSupply, newMaxSupply);
         maxSupply = newMaxSupply;
         return true;
@@ -340,7 +320,7 @@ contract QUACK {
      * @param account The address to get votes balance
      * @return The number of current votes for `account`
      */
-    function getCurrentVotes(address account) external view returns (uint96) {
+    function getCurrentVotes(address account) external view returns (uint256) {
         uint32 nCheckpoints = numCheckpoints[account];
         return nCheckpoints > 0 ? checkpoints[account][nCheckpoints - 1].votes : 0;
     }
@@ -352,7 +332,7 @@ contract QUACK {
      * @param blockNumber The block number to get the vote balance at
      * @return The number of votes the account had as of the given block
      */
-    function getPriorVotes(address account, uint blockNumber) public view returns (uint96) {
+    function getPriorVotes(address account, uint blockNumber) public view returns (uint256) {
         require(blockNumber < block.number, "QUACK::getPriorVotes: not yet determined");
 
         uint32 nCheckpoints = numCheckpoints[account];
@@ -388,7 +368,7 @@ contract QUACK {
 
     function _delegate(address delegator, address delegatee) internal {
         address currentDelegate = delegates[delegator];
-        uint96 delegatorBalance = balances[delegator];
+        uint256 delegatorBalance = balances[delegator];
         delegates[delegator] = delegatee;
 
         emit DelegateChanged(delegator, currentDelegate, delegatee);
@@ -396,21 +376,21 @@ contract QUACK {
         _moveDelegates(currentDelegate, delegatee, delegatorBalance);
     }
 
-    function _transferTokens(address src, address dst, uint96 amount) internal {
+    function _transferTokens(address src, address dst, uint256 amount) internal {
         require(src != address(0), "QUACK::_transferTokens: cannot transfer from the zero address");
         require(dst != address(0), "QUACK::_transferTokens: cannot transfer to the zero address");
 
-        balances[src] = sub96(balances[src], amount, "QUACK::_transferTokens: transfer amount exceeds balance");
-        balances[dst] = add96(balances[dst], amount, "QUACK::_transferTokens: transfer amount overflows");
+        balances[src] = sub256(balances[src], amount, "QUACK::_transferTokens: transfer amount exceeds balance");
+        balances[dst] = add256(balances[dst], amount, "QUACK::_transferTokens: transfer amount overflows");
         emit Transfer(src, dst, amount);
 
         _moveDelegates(delegates[src], delegates[dst], amount);
     }
 
-    function _burnTokens(address src, uint96 amount) internal {
+    function _burnTokens(address src, uint256 amount) internal {
         require(src != address(0), "QUACK::_burnTokens: cannot burn from the zero address");
 
-        balances[src] = sub96(balances[src], amount, "QUACK::_burnTokens: burn amount exceeds balance");
+        balances[src] = sub256(balances[src], amount, "QUACK::_burnTokens: burn amount exceeds balance");
         totalSupply = SafeMath.sub(totalSupply, uint(amount));
         burnedSupply = SafeMath.add(burnedSupply, uint(amount));
         emit Transfer(src, address(0), amount);
@@ -418,11 +398,11 @@ contract QUACK {
         _moveDelegates(delegates[src], address(0), amount);
     }
 
-    function _mintTokens(address dst, uint96 amount) internal {
+    function _mintTokens(address dst, uint256 amount) internal {
         require(dst != address(0), "QUACK::_mintTokens: cannot mint to the zero address");
 
         totalSupply = SafeMath.add(totalSupply, uint(amount));
-        balances[dst] = add96(balances[dst], amount, "QUACK::_mintTokens: mint amount overflows");
+        balances[dst] = add256(balances[dst], amount, "QUACK::_mintTokens: mint amount overflows");
         emit Transfer(address(0), dst, amount);
 
         require(totalSupply <= maxSupply, "QUACK::_mintTokens: mint result exceeds max supply");
@@ -431,25 +411,25 @@ contract QUACK {
         _moveDelegates(address(0), delegates[dst], amount);
     }
 
-    function _moveDelegates(address srcRep, address dstRep, uint96 amount) internal {
+    function _moveDelegates(address srcRep, address dstRep, uint256 amount) internal {
         if (srcRep != dstRep && amount > 0) {
             if (srcRep != address(0)) {
                 uint32 srcRepNum = numCheckpoints[srcRep];
-                uint96 srcRepOld = srcRepNum > 0 ? checkpoints[srcRep][srcRepNum - 1].votes : 0;
-                uint96 srcRepNew = sub96(srcRepOld, amount, "QUACK::_moveVotes: vote amount underflows");
+                uint256 srcRepOld = srcRepNum > 0 ? checkpoints[srcRep][srcRepNum - 1].votes : 0;
+                uint256 srcRepNew = sub256(srcRepOld, amount, "QUACK::_moveVotes: vote amount underflows");
                 _writeCheckpoint(srcRep, srcRepNum, srcRepOld, srcRepNew);
             }
 
             if (dstRep != address(0)) {
                 uint32 dstRepNum = numCheckpoints[dstRep];
-                uint96 dstRepOld = dstRepNum > 0 ? checkpoints[dstRep][dstRepNum - 1].votes : 0;
-                uint96 dstRepNew = add96(dstRepOld, amount, "QUACK::_moveVotes: vote amount overflows");
+                uint256 dstRepOld = dstRepNum > 0 ? checkpoints[dstRep][dstRepNum - 1].votes : 0;
+                uint256 dstRepNew = add256(dstRepOld, amount, "QUACK::_moveVotes: vote amount overflows");
                 _writeCheckpoint(dstRep, dstRepNum, dstRepOld, dstRepNew);
             }
         }
     }
 
-    function _writeCheckpoint(address delegatee, uint32 nCheckpoints, uint96 oldVotes, uint96 newVotes) internal {
+    function _writeCheckpoint(address delegatee, uint32 nCheckpoints, uint256 oldVotes, uint256 newVotes) internal {
       uint32 blockNumber = safe32(block.number, "QUACK::_writeCheckpoint: block number exceeds 32 bits");
 
       if (nCheckpoints > 0 && checkpoints[delegatee][nCheckpoints - 1].fromBlock == blockNumber) {
@@ -467,18 +447,13 @@ contract QUACK {
         return uint32(n);
     }
 
-    function safe96(uint n, string memory errorMessage) internal pure returns (uint96) {
-        require(n < 2**96, errorMessage);
-        return uint96(n);
-    }
-
-    function add96(uint96 a, uint96 b, string memory errorMessage) internal pure returns (uint96) {
-        uint96 c = a + b;
+    function add256(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+        uint256 c = a + b;
         require(c >= a, errorMessage);
         return c;
     }
 
-    function sub96(uint96 a, uint96 b, string memory errorMessage) internal pure returns (uint96) {
+    function sub256(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
         require(b <= a, errorMessage);
         return a - b;
     }

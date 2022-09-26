@@ -1,4 +1,4 @@
-// test/PNG.js
+// test/QUACK.js
 // Load dependencies
 const { expect } = require('chai');
 const { ethers } = require('hardhat');
@@ -11,15 +11,15 @@ const UINT96_MAX = ethers.BigNumber.from("2").pow("96").sub("1");
 
 // Start test block
 // Only tests for the new features added by shung
-describe('PNG', function () {
+describe('QUACK', function () {
 
   before(async function () {
     [ this.admin, ] = await ethers.getSigners();
-    this.PNG = await ethers.getContractFactory("Png");
+    this.QUACK = await ethers.getContractFactory("QUACK");
   });
 
   beforeEach(async function () {
-    this.png = await this.PNG.deploy(TOTAL_SUPPLY, AIRDROP_SUPPLY, "PNG", "QuackSwap");
+    this.png = await this.QUACK.deploy(TOTAL_SUPPLY, AIRDROP_SUPPLY, "QUACK", "QuackSwap");
     await this.png.deployed();
   });
 
@@ -38,7 +38,7 @@ describe('PNG', function () {
       expect(await this.png.totalSupply()).to.equal(AIRDROP_SUPPLY);
     });
     it('arg 3: symbol', async function () {
-      expect(await this.png.symbol()).to.equal("PNG");
+      expect(await this.png.symbol()).to.equal("QUACK");
     });
     it('arg 4: name', async function () {
       expect(await this.png.name()).to.equal("QuackSwap");
@@ -63,7 +63,7 @@ describe('PNG', function () {
   //////////////////////////////
   describe("mint", function () {
     it('unauthorized cannot mint', async function() {
-      await expect(this.png.mint(this.admin.address, 1)).to.be.revertedWith("Png::mint: unauthorized");
+      await expect(this.png.mint(this.admin.address, 1)).to.be.revertedWith("QUACK::mint: unauthorized");
     });
 
     it('authorized can mint', async function() {
@@ -85,7 +85,7 @@ describe('PNG', function () {
 
       await expect(this.png.setMinter(this.admin.address)).to.emit(this.png, "MinterChanged");
 
-      await expect(this.png.mint(this.admin.address, TOTAL_SUPPLY.sub(AIRDROP_SUPPLY).add("1"))).to.be.revertedWith("Png::_mintTokens: mint result exceeds max supply");
+      await expect(this.png.mint(this.admin.address, TOTAL_SUPPLY.sub(AIRDROP_SUPPLY).add("1"))).to.be.revertedWith("QUACK::_mintTokens: mint result exceeds max supply");
 
       expect(await this.png.balanceOf(this.admin.address)).to.equal(AIRDROP_SUPPLY);
       expect(await this.png.totalSupply()).to.equal(AIRDROP_SUPPLY);
@@ -98,24 +98,11 @@ describe('PNG', function () {
 
       await expect(this.png.setMinter(this.admin.address)).to.emit(this.png, "MinterChanged");
 
-      await expect(this.png.mint(ZERO_ADDRESS, 1)).to.be.revertedWith("Png::_mintTokens: cannot mint to the zero address");
+      await expect(this.png.mint(ZERO_ADDRESS, 1)).to.be.revertedWith("QUACK::_mintTokens: cannot mint to the zero address");
 
       expect(await this.png.totalSupply()).to.equal(AIRDROP_SUPPLY);
       expect(await this.png.balanceOf(ZERO_ADDRESS)).to.equal(0);
     });
-
-    it('cannot mint above 96 bits', async function() {
-      expect(await this.png.balanceOf(this.admin.address)).to.equal(AIRDROP_SUPPLY);
-      expect(await this.png.totalSupply()).to.equal(AIRDROP_SUPPLY);
-
-      await expect(this.png.setMinter(this.admin.address)).to.emit(this.png, "MinterChanged");
-
-      await expect(this.png.mint(this.admin.address, UINT96_MAX.sub(AIRDROP_SUPPLY).add("1"))).to.be.revertedWith("Png::_mintTokens: mint amount overflows");
-
-      expect(await this.png.totalSupply()).to.equal(AIRDROP_SUPPLY);
-      expect(await this.png.balanceOf(this.admin.address)).to.equal(AIRDROP_SUPPLY);
-    });
-
   });
 
 
@@ -123,19 +110,10 @@ describe('PNG', function () {
   //     burn
   //////////////////////////////
   describe("burn", function () {
-    it('cannot burn above 96 bits', async function() {
-      expect(await this.png.balanceOf(this.admin.address)).to.equal(AIRDROP_SUPPLY);
-
-      await expect(this.png.burn(UINT96_MAX.add("1"))).to.be.revertedWith("Png::burn: amount exceeds 96 bits");
-
-      expect(await this.png.burnedSupply()).to.equal("0");
-      expect(await this.png.balanceOf(this.admin.address)).to.equal(AIRDROP_SUPPLY);
-    });
-
     it('cannot burn more than balance', async function() {
       expect(await this.png.balanceOf(this.admin.address)).to.equal(AIRDROP_SUPPLY);
 
-      await expect(this.png.burn(AIRDROP_SUPPLY.add("1"))).to.be.revertedWith("Png::_burnTokens: burn amount exceeds balance");
+      await expect(this.png.burn(AIRDROP_SUPPLY.add("1"))).to.be.revertedWith("QUACK::_burnTokens: burn amount exceeds balance");
 
       expect(await this.png.burnedSupply()).to.equal("0");
       expect(await this.png.balanceOf(this.admin.address)).to.equal(AIRDROP_SUPPLY);
@@ -160,18 +138,6 @@ describe('PNG', function () {
   //     burnFrom
   //////////////////////////////
   describe("burnFrom", function () {
-    it('cannot burn above 96 bits', async function() {
-      [ , altAddr] = await ethers.getSigners();
-      altContract = await this.png.connect(altAddr);
-
-      expect(await this.png.balanceOf(this.admin.address)).to.equal(AIRDROP_SUPPLY);
-
-      await expect(altContract.burnFrom(this.admin.address, UINT96_MAX.add("1"))).to.be.revertedWith("Png::burnFrom: amount exceeds 96 bits");
-
-      expect(await this.png.burnedSupply()).to.equal("0");
-      expect(await this.png.totalSupply()).to.equal(AIRDROP_SUPPLY);
-      expect(await this.png.balanceOf(this.admin.address)).to.equal(AIRDROP_SUPPLY);
-    });
 
     it('cannot burn without allowance', async function() {
       [ , altAddr] = await ethers.getSigners();
@@ -179,7 +145,7 @@ describe('PNG', function () {
 
       expect(await this.png.balanceOf(this.admin.address)).to.equal(AIRDROP_SUPPLY);
 
-      await expect(altContract.burnFrom(this.admin.address, "1")).to.be.revertedWith("Png::burnFrom: burn amount exceeds spender allowance");
+      await expect(altContract.burnFrom(this.admin.address, "1")).to.be.revertedWith("QUACK::burnFrom: burn amount exceeds spender allowance");
 
       expect(await this.png.burnedSupply()).to.equal("0");
       expect(await this.png.totalSupply()).to.equal(AIRDROP_SUPPLY);
@@ -212,7 +178,7 @@ describe('PNG', function () {
       await expect(this.png.approve(altAddr.address, UINT96_MAX)).to.emit(this.png, "Approval");
       expect(await this.png.allowance(this.admin.address, altAddr.address)).to.equal(UINT96_MAX);
 
-      await expect(altContract.burnFrom(this.admin.address, AIRDROP_SUPPLY.add("1"))).to.be.revertedWith("Png::_burnTokens: burn amount exceeds balance");
+      await expect(altContract.burnFrom(this.admin.address, AIRDROP_SUPPLY.add("1"))).to.be.revertedWith("QUACK::_burnTokens: burn amount exceeds balance");
 
       expect(await this.png.burnedSupply()).to.equal("0");
       expect(await this.png.balanceOf(this.admin.address)).to.equal(AIRDROP_SUPPLY);
@@ -243,7 +209,7 @@ describe('PNG', function () {
 
       expect(await this.png.minter()).to.equal(ZERO_ADDRESS);
 
-      await expect(altContract.setMinter(altAddr.address)).to.be.revertedWith("Png::setMinter: unauthorized");
+      await expect(altContract.setMinter(altAddr.address)).to.be.revertedWith("QUACK::setMinter: unauthorized");
 
       expect(await this.png.minter()).to.equal(ZERO_ADDRESS);
     });
@@ -271,7 +237,7 @@ describe('PNG', function () {
 
       expect(await this.png.admin()).to.equal(this.admin.address);
 
-      await expect(altContract.setAdmin(altAddr.address)).to.be.revertedWith("Png::setAdmin: unauthorized");
+      await expect(altContract.setAdmin(altAddr.address)).to.be.revertedWith("QUACK::setAdmin: unauthorized");
 
       expect(await this.png.admin()).to.equal(this.admin.address);
     });
@@ -279,7 +245,7 @@ describe('PNG', function () {
     it('cannot set zero address admin', async function() {
       expect(await this.png.admin()).to.equal(this.admin.address);
 
-      await expect(this.png.setAdmin(ZERO_ADDRESS)).to.be.revertedWith("Png::setAdmin: cannot make zero address the admin");
+      await expect(this.png.setAdmin(ZERO_ADDRESS)).to.be.revertedWith("QUACK::setAdmin: cannot make zero address the admin");
 
       expect(await this.png.admin()).to.equal(this.admin.address);
     });
@@ -297,7 +263,7 @@ describe('PNG', function () {
 
       expect(await this.png.maxSupply()).to.equal(TOTAL_SUPPLY);
 
-      await expect(altContract.setMaxSupply(AIRDROP_SUPPLY)).to.be.revertedWith("Png::setMaxSupply: unauthorized");
+      await expect(altContract.setMaxSupply(AIRDROP_SUPPLY)).to.be.revertedWith("QUACK::setMaxSupply: unauthorized");
 
       expect(await this.png.maxSupply()).to.equal(TOTAL_SUPPLY);
     });
@@ -313,15 +279,7 @@ describe('PNG', function () {
     it('cannot set max supply less than circulating supply', async function() {
       expect(await this.png.maxSupply()).to.equal(TOTAL_SUPPLY);
 
-      await expect(this.png.setMaxSupply(AIRDROP_SUPPLY.sub("1"))).to.be.revertedWith("Png::setMaxSupply: circulating supply exceeds new max supply");
-
-      expect(await this.png.maxSupply()).to.equal(TOTAL_SUPPLY);
-    });
-
-    it('cannot set max supply more than 96 bits', async function() {
-      expect(await this.png.maxSupply()).to.equal(TOTAL_SUPPLY);
-
-      await expect(this.png.setMaxSupply(UINT96_MAX.add("1"))).to.be.revertedWith("Png::setMaxSupply: new max supply exceeds 96 bits");
+      await expect(this.png.setMaxSupply(AIRDROP_SUPPLY.sub("1"))).to.be.revertedWith("QUACK::setMaxSupply: circulating supply exceeds new max supply");
 
       expect(await this.png.maxSupply()).to.equal(TOTAL_SUPPLY);
     });
@@ -330,7 +288,7 @@ describe('PNG', function () {
       expect(await this.png.maxSupply()).to.equal(TOTAL_SUPPLY);
 
       await expect(this.png.disableSetMaxSupply()).to.emit(this.png, "HardcapEnabled");
-      await expect(this.png.setMaxSupply(AIRDROP_SUPPLY)).to.be.revertedWith("Png::setMaxSupply: function was disabled");
+      await expect(this.png.setMaxSupply(AIRDROP_SUPPLY)).to.be.revertedWith("QUACK::setMaxSupply: function was disabled");
 
       expect(await this.png.maxSupply()).to.equal(TOTAL_SUPPLY);
     });
@@ -348,7 +306,7 @@ describe('PNG', function () {
 
       expect(await this.png.hardcapped()).to.equal(false);
 
-      await expect(altContract.disableSetMaxSupply()).to.be.revertedWith("Png::disableSetMaxSupply: unauthorized");
+      await expect(altContract.disableSetMaxSupply()).to.be.revertedWith("QUACK::disableSetMaxSupply: unauthorized");
       await expect(this.png.setMaxSupply(AIRDROP_SUPPLY)).to.emit(this.png, "MaxSupplyChanged");
 
       expect(await this.png.hardcapped()).to.equal(false);
@@ -358,7 +316,7 @@ describe('PNG', function () {
       expect(await this.png.hardcapped()).to.equal(false);
 
       await expect(this.png.disableSetMaxSupply()).to.emit(this.png, "HardcapEnabled");
-      await expect(this.png.setMaxSupply(AIRDROP_SUPPLY)).to.be.revertedWith("Png::setMaxSupply: function was disabled");
+      await expect(this.png.setMaxSupply(AIRDROP_SUPPLY)).to.be.revertedWith("QUACK::setMaxSupply: function was disabled");
 
       expect(await this.png.hardcapped()).to.equal(true);
     });

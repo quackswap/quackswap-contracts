@@ -118,13 +118,13 @@ contract QUACK {
      * @dev This will overwrite the approval amount for `spender`
      *  and is subject to issues noted [here](https://eips.ethereum.org/EIPS/eip-20#approve)
      * @param spender The address of the account which may transfer tokens
-     * @param rawAmount The number of tokens that are approved (2^256-1 means infinite)
+     * @param amount The number of tokens that are approved (2^256-1 means infinite)
      * @return Whether or not the approval succeeded
      */
-    function approve(address spender, uint256 rawAmount) external returns (bool) {
-        allowances[msg.sender][spender] = rawAmount;
+    function approve(address spender, uint256 amount) external returns (bool) {
+        allowances[msg.sender][spender] = amount;
 
-        emit Approval(msg.sender, spender, rawAmount);
+        emit Approval(msg.sender, spender, amount);
         return true;
     }
 
@@ -132,24 +132,24 @@ contract QUACK {
      * @notice Triggers an approval from owner to spends
      * @param owner The address to approve from
      * @param spender The address to be approved
-     * @param rawAmount The number of tokens that are approved (2^256-1 means infinite)
+     * @param amount The number of tokens that are approved (2^256-1 means infinite)
      * @param deadline The time at which to expire the signature
      * @param v The recovery byte of the signature
      * @param r Half of the ECDSA signature pair
      * @param s Half of the ECDSA signature pair
      */
-    function permit(address owner, address spender, uint256 rawAmount, uint deadline, uint8 v, bytes32 r, bytes32 s) external {
+    function permit(address owner, address spender, uint256 amount, uint deadline, uint8 v, bytes32 r, bytes32 s) external {
         bytes32 domainSeparator = keccak256(abi.encode(DOMAIN_TYPEHASH, keccak256(bytes(name)), getChainId(), address(this)));
-        bytes32 structHash = keccak256(abi.encode(PERMIT_TYPEHASH, owner, spender, rawAmount, nonces[owner]++, deadline));
+        bytes32 structHash = keccak256(abi.encode(PERMIT_TYPEHASH, owner, spender, amount, nonces[owner]++, deadline));
         bytes32 digest = keccak256(abi.encodePacked("\x19\x01", domainSeparator, structHash));
         address signatory = ecrecover(digest, v, r, s);
         require(signatory != address(0), "QUACK::permit: invalid signature");
         require(signatory == owner, "QUACK::permit: unauthorized");
         require(now <= deadline, "QUACK::permit: signature expired");
 
-        allowances[owner][spender] = rawAmount;
+        allowances[owner][spender] = amount;
 
-        emit Approval(owner, spender, rawAmount);
+        emit Approval(owner, spender, amount);
     }
 
     /**
@@ -164,23 +164,23 @@ contract QUACK {
     /**
      * @notice Mint `amount` tokens to `dst`
      * @param dst The address of the destination account
-     * @param rawAmount The number of tokens to mint
+     * @param amount The number of tokens to mint
      * @return Whether or not the transfer succeeded
      */
-    function mint(address dst, uint256 rawAmount) external returns (bool) {
+    function mint(address dst, uint256 amount) external returns (bool) {
         require(msg.sender == minter && minter != address(0), "QUACK::mint: unauthorized");
-        _mintTokens(dst, rawAmount);
+        _mintTokens(dst, amount);
         return true;
     }
 
     /**
      * @notice Transfer `amount` tokens from `msg.sender` to `dst`
      * @param dst The address of the destination account
-     * @param rawAmount The number of tokens to transfer
+     * @param amount The number of tokens to transfer
      * @return Whether or not the transfer succeeded
      */
-    function transfer(address dst, uint256 rawAmount) external returns (bool) {
-        _transferTokens(msg.sender, dst, rawAmount);
+    function transfer(address dst, uint256 amount) external returns (bool) {
+        _transferTokens(msg.sender, dst, amount);
         return true;
     }
 
@@ -188,52 +188,52 @@ contract QUACK {
      * @notice Transfer `amount` tokens from `src` to `dst`
      * @param src The address of the source account
      * @param dst The address of the destination account
-     * @param rawAmount The number of tokens to transfer
+     * @param amount The number of tokens to transfer
      * @return Whether or not the transfer succeeded
      */
-    function transferFrom(address src, address dst, uint256 rawAmount) external returns (bool) {
+    function transferFrom(address src, address dst, uint256 amount) external returns (bool) {
         address spender = msg.sender;
         uint256 spenderAllowance = allowances[src][spender];
 
         if (spender != src && spenderAllowance != uint256(-1)) {
-            uint256 newAllowance = sub256(spenderAllowance, rawAmount, "QUACK::transferFrom: transfer amount exceeds spender allowance");
+            uint256 newAllowance = sub256(spenderAllowance, amount, "QUACK::transferFrom: transfer amount exceeds spender allowance");
             allowances[src][spender] = newAllowance;
 
             emit Approval(src, spender, newAllowance);
         }
 
-        _transferTokens(src, dst, rawAmount);
+        _transferTokens(src, dst, amount);
         return true;
     }
 
     /**
      * @notice Burn `amount` tokens of `msg.sender`
-     * @param rawAmount The number of tokens to burn
+     * @param amount The number of tokens to burn
      * @return Whether or not the burn succeeded
      */
-    function burn(uint256 rawAmount) external returns (bool) {
-        _burnTokens(msg.sender, rawAmount);
+    function burn(uint256 amount) external returns (bool) {
+        _burnTokens(msg.sender, amount);
         return true;
     }
 
     /**
      * @notice Burn `amount` tokens of `src`
      * @param src The address of the source account
-     * @param rawAmount The number of tokens to burn
+     * @param amount The number of tokens to burn
      * @return Whether or not the transfer succeeded
      */
-    function burnFrom(address src, uint256 rawAmount) external returns (bool) {
+    function burnFrom(address src, uint256 amount) external returns (bool) {
         address spender = msg.sender;
         uint256 spenderAllowance = allowances[src][spender];
 
         if (spender != src && spenderAllowance != uint256(-1)) {
-            uint256 newAllowance = sub256(spenderAllowance, rawAmount, "QUACK::burnFrom: burn amount exceeds spender allowance");
+            uint256 newAllowance = sub256(spenderAllowance, amount, "QUACK::burnFrom: burn amount exceeds spender allowance");
             allowances[src][spender] = newAllowance;
 
             emit Approval(src, spender, newAllowance);
         }
 
-        _burnTokens(src, rawAmount);
+        _burnTokens(src, amount);
         return true;
     }
 

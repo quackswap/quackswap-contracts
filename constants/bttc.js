@@ -4,5 +4,5 @@ exports.QUACK_SYMBOL = "QUACK";
 exports.QUACK_NAME = "QuackSwap Token";
 exports.TOTAL_SUPPLY = 888888888888;
 exports.AIRDROP_AMOUNT = 88888888888.8;
-exports.BTT_QUACK_FARM_ALLOCATION = 0, // 30x weight
+exports.BTT_QUACK_FARM_ALLOCATION = 0,
 exports.INITIAL_FARMS = [];

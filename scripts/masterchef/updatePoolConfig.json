@@ -1,0 +1,17 @@
+{
+  "masterChefAddress": "",
+  "pools": [
+  {
+    "name": "QUACK-WBTT",
+    "pid": 0,
+    "alloc": 1000,
+    "address": "0x7AC8499A16279F33917154a51C8Ef2a024D9953a"
+  },
+  {
+    "name": "WBTT-USDT_b",
+    "pid": 1,
+    "alloc": 1000,
+    "address": "0x1fE3f8B84990134aA1fc277E3BB5FDF09981920e"
+  }
+]
+}
